@@ -1,0 +1,405 @@
+<template>
+  <div class="recipe-detail-page">
+    <div v-if="recipe" class="container py-4">
+      <!-- Breadcrumb Navigation -->
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <router-link to="/" class="text-decoration-none">
+              <i class="fas fa-home me-1"></i>Home
+            </router-link>
+          </li>
+          <li class="breadcrumb-item">
+            <router-link to="/recipes" class="text-decoration-none">
+              <i class="fas fa-utensils me-1"></i>Recipes
+            </router-link>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">{{ recipe.title }}</li>
+        </ol>
+      </nav>
+
+      <!-- Recipe Header -->
+      <div class="row mb-4">
+        <div class="col-lg-6">
+          <div class="recipe-image-container">
+            <img 
+              :src="recipe.image" 
+              :alt="recipe.title"
+              class="img-fluid rounded shadow recipe-main-image"
+            >
+            <div class="image-overlay">
+              <span class="badge bg-primary fs-6">{{ recipe.category }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="recipe-header-info">
+            <h1 class="display-5 mb-3">{{ recipe.title }}</h1>
+            <p class="lead text-muted mb-4">{{ recipe.description }}</p>
+            
+            <!-- Recipe Stats -->
+            <div class="row g-3 mb-4">
+              <div class="col-6 col-md-3">
+                <div class="stat-card text-center p-3 bg-light rounded">
+                  <i class="fas fa-clock text-primary fs-4 mb-2"></i>
+                  <div class="fw-bold">{{ recipe.cookingTime }} min</div>
+                  <small class="text-muted">Cook Time</small>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card text-center p-3 bg-light rounded">
+                  <i class="fas fa-users text-success fs-4 mb-2"></i>
+                  <div class="fw-bold">{{ recipe.servings }}</div>
+                  <small class="text-muted">Servings</small>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card text-center p-3 bg-light rounded">
+                  <i class="fas fa-fire text-danger fs-4 mb-2"></i>
+                  <div class="fw-bold">{{ recipe.calories }}</div>
+                  <small class="text-muted">Calories</small>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card text-center p-3 bg-light rounded">
+                  <i class="fas fa-chart-line text-warning fs-4 mb-2"></i>
+                  <div class="fw-bold">{{ recipe.difficulty }}</div>
+                  <small class="text-muted">Difficulty</small>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Recipe Tags -->
+            <div class="recipe-tags mb-4">
+              <h6 class="mb-2">Tags:</h6>
+              <span 
+                v-for="tag in recipe.tags" 
+                :key="tag"
+                class="badge bg-secondary me-2 mb-1"
+              >
+                {{ tag }}
+              </span>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn btn-primary">
+                <i class="fas fa-heart me-2"></i>Save Recipe
+              </button>
+              <button class="btn btn-outline-primary">
+                <i class="fas fa-share me-2"></i>Share
+              </button>
+              <button class="btn btn-outline-secondary">
+                <i class="fas fa-print me-2"></i>Print
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recipe Content -->
+      <div class="row">
+        <!-- Ingredients Section -->
+        <div class="col-lg-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-header bg-primary text-white">
+              <h4 class="card-title mb-0">
+                <i class="fas fa-list-ul me-2"></i>Ingredients
+              </h4>
+            </div>
+            <div class="card-body">
+              <ul class="list-unstyled ingredients-list">
+                <li 
+                  v-for="(ingredient, index) in recipe.ingredients" 
+                  :key="index"
+                  class="ingredient-item d-flex align-items-center mb-2 p-2 rounded"
+                >
+                  <input 
+                    type="checkbox" 
+                    :id="`ingredient-${index}`"
+                    class="form-check-input me-3"
+                  >
+                  <label 
+                    :for="`ingredient-${index}`"
+                    class="form-check-label flex-grow-1"
+                  >
+                    {{ ingredient }}
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Instructions Section -->
+        <div class="col-lg-8 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-header bg-success text-white">
+              <h4 class="card-title mb-0">
+                <i class="fas fa-clipboard-list me-2"></i>Instructions
+              </h4>
+            </div>
+            <div class="card-body">
+              <ol class="instructions-list">
+                <li 
+                  v-for="(instruction, index) in recipe.instructions" 
+                  :key="index"
+                  class="instruction-item mb-3 p-3 bg-light rounded"
+                >
+                  <div class="d-flex align-items-start">
+                    <span class="step-number badge bg-success me-3 mt-1">
+                      {{ index + 1 }}
+                    </span>
+                    <div class="instruction-text flex-grow-1">
+                      {{ instruction }}
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alternatives Section -->
+      <div class="row mt-4" v-if="recipe.alternatives">
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark">
+              <h4 class="card-title mb-0">
+                <i class="fas fa-exchange-alt me-2"></i>Ingredient Alternatives
+              </h4>
+              <small class="text-muted">Substitute ingredients based on dietary preferences or availability</small>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div 
+                  v-for="(alternative, ingredient) in recipe.alternatives" 
+                  :key="ingredient"
+                  class="col-md-6 col-lg-4 mb-3"
+                >
+                  <div class="alternative-item p-3 border rounded">
+                    <div class="fw-bold text-primary mb-1">{{ ingredient }}</div>
+                    <div class="text-muted">
+                      <i class="fas fa-arrow-right me-2"></i>{{ alternative }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center">
+            <router-link to="/recipes" class="btn btn-outline-secondary">
+              <i class="fas fa-arrow-left me-2"></i>Back to Recipes
+            </router-link>
+            <div class="d-flex gap-2">
+              <button 
+                @click="goToPreviousRecipe" 
+                :disabled="!previousRecipe"
+                class="btn btn-outline-primary"
+              >
+                <i class="fas fa-chevron-left me-2"></i>Previous
+              </button>
+              <button 
+                @click="goToNextRecipe" 
+                :disabled="!nextRecipe"
+                class="btn btn-outline-primary"
+              >
+                Next<i class="fas fa-chevron-right ms-2"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recipe Not Found -->
+    <div v-else class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+          <div class="card">
+            <div class="card-body py-5">
+              <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+              <h3 class="text-muted">Recipe Not Found</h3>
+              <p class="text-muted mb-4">The recipe you're looking for doesn't exist or has been removed.</p>
+              <router-link to="/recipes" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Recipes
+              </router-link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import recipesData from '@/data/recipes.json'
+
+export default {
+  name: 'RecipeDetail',
+  data() {
+    return {
+      recipes: recipesData
+    }
+  },
+  computed: {
+    recipe() {
+      const id = parseInt(this.$route.params.id)
+      return this.recipes.find(recipe => recipe.id === id)
+    },
+    currentIndex() {
+      if (!this.recipe) return -1
+      return this.recipes.findIndex(recipe => recipe.id === this.recipe.id)
+    },
+    previousRecipe() {
+      if (this.currentIndex <= 0) return null
+      return this.recipes[this.currentIndex - 1]
+    },
+    nextRecipe() {
+      if (this.currentIndex >= this.recipes.length - 1) return null
+      return this.recipes[this.currentIndex + 1]
+    }
+  },
+  methods: {
+    goToPreviousRecipe() {
+      if (this.previousRecipe) {
+        this.$router.push(`/recipe/${this.previousRecipe.id}`)
+      }
+    },
+    goToNextRecipe() {
+      if (this.nextRecipe) {
+        this.$router.push(`/recipe/${this.nextRecipe.id}`)
+      }
+    }
+  },
+  watch: {
+    '$route'() {
+      // Scroll to top when route changes
+      window.scrollTo(0, 0)
+    }
+  }
+}
+</script>
+
+<style scoped>
+.recipe-detail-page {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.recipe-image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+.recipe-main-image {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.recipe-main-image:hover {
+  transform: scale(1.05);
+}
+
+.image-overlay {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.stat-card {
+  transition: transform 0.2s ease;
+  border: 1px solid #e9ecef;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ingredients-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.ingredient-item {
+  transition: background-color 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.ingredient-item:hover {
+  background-color: #f8f9fa !important;
+  border-color: #dee2e6;
+}
+
+.ingredient-item input:checked + label {
+  text-decoration: line-through;
+  color: #6c757d;
+}
+
+.instructions-list {
+  counter-reset: none;
+  list-style: none;
+  padding: 0;
+}
+
+.instruction-item {
+  border-left: 4px solid #28a745;
+  transition: all 0.2s ease;
+}
+
+.instruction-item:hover {
+  background-color: #e8f5e8 !important;
+  border-left-color: #20c997;
+}
+
+.step-number {
+  min-width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.alternative-item {
+  transition: all 0.2s ease;
+  background-color: #fff;
+}
+
+.alternative-item:hover {
+  background-color: #fff3cd;
+  border-color: #ffc107 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.recipe-tags .badge {
+  font-size: 0.8rem;
+  padding: 0.5rem 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .recipe-main-image {
+    height: 250px;
+  }
+  
+  .display-5 {
+    font-size: 2rem;
+  }
+  
+  .stat-card {
+    margin-bottom: 1rem;
+  }
+}
+</style>
