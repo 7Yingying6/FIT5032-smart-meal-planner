@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #9BC7AF;">
     <div class="container">
       <router-link class="navbar-brand" to="/">
         <i class="fas fa-utensils me-2"></i>
@@ -68,7 +68,7 @@ export default {
 }
 
 /* Color coding for modules */
-.recipes-module { color: #007bff !important; }
-.meal-plan-module { color: #28a745 !important; }
-.auth-module { color: #6f42c1 !important; }
+.recipes-module { color:  #9BC7AF!important; }
+.meal-plan-module { color: #C7EED0 !important; }
+.auth-module { color: #9BC7AF !important; }
 </style>

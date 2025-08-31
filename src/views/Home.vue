@@ -297,16 +297,43 @@ export default {
   }
   
   .floating-elements {
-    height: 300px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .floating-icon {
-    display: none;
+    position: absolute;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .floating-icon-1 {
+    top: 10%;
+    left: 15%;
+    font-size: 1.5rem;
+  }
+  
+  .floating-icon-2 {
+    top: 15%;
+    right: 20%;
+    font-size: 1.2rem;
+  }
+  
+  .floating-icon-3 {
+    bottom: 20%;
+    left: 10%;
+    font-size: 1.2rem;
   }
   
   .main-icon {
     position: static;
     transform: none;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  
+  .main-icon i {
+    font-size: 4rem !important;
   }
   
   .min-vh-75 {
@@ -315,6 +342,10 @@ export default {
   
   .tech-badge {
     font-size: 0.9rem;
+  }
+  
+  .hero-content {
+    margin-bottom: 2rem;
   }
 }
 </style>
