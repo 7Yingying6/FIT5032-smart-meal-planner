@@ -21,6 +21,16 @@
       <h5 class="card-title">{{ recipe.title }}</h5>
       <p class="card-text text-muted flex-grow-1">{{ recipe.description }}</p>
       
+      <!-- Rating Display -->
+      <div class="mb-2">
+        <StarRating 
+          :recipe-id="recipe.id"
+          :average-rating="recipe.averageRating || 0"
+          :total-ratings="recipe.totalRatings || 0"
+          mode="display"
+        />
+      </div>
+      
       <div class="recipe-meta mb-3">
         <div class="row text-center">
           <div class="col-4">
@@ -73,8 +83,13 @@
 </template>
 
 <script>
+import StarRating from './StarRating.vue'
+
 export default {
   name: 'RecipeCard',
+  components: {
+    StarRating
+  },
   props: {
     recipe: {
       type: Object,
@@ -86,23 +101,16 @@ export default {
 
 <style scoped>
 .recipe-card {
-  transition: all 0.3s ease;
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .recipe-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .recipe-image {
   height: 200px;
   object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.recipe-card:hover .recipe-image {
-  transform: scale(1.05);
 }
 
 .recipe-meta {
@@ -115,12 +123,7 @@ export default {
   font-size: 0.7rem;
 }
 
-.btn-primary {
-  transition: all 0.3s ease;
-}
-
 .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  /* Simplified button hover effect */
 }
 </style>

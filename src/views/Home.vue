@@ -125,10 +125,9 @@ export default {
 
 <style scoped>
 .hero-section {
-  background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 25%, #68a085 50%, #86c5b1 75%, #a4eadd 100%);
+  background: #4a7c59;
   min-height: 100vh;
   position: relative;
-  overflow: hidden;
 }
 
 .hero-overlay {
@@ -137,7 +136,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg, rgba(45, 90, 39, 0.8) 0%, rgba(104, 160, 133, 0.6) 100%);
+  background: rgba(45, 90, 39, 0.7);
   z-index: 1;
 }
 
@@ -150,12 +149,11 @@ export default {
 }
 
 .hero-title {
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  animation: fadeInUp 1s ease-out;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .hero-content {
-  animation: fadeInLeft 1s ease-out 0.3s both;
+  /* Remove animation effects */
 }
 
 .executive-summary {
@@ -168,30 +166,25 @@ export default {
 .floating-elements {
   position: relative;
   height: 400px;
-  animation: fadeInRight 1s ease-out 0.6s both;
 }
 
 .floating-icon {
   position: absolute;
-  animation: float 4s ease-in-out infinite;
 }
 
 .floating-icon-1 {
   top: 20%;
   left: 10%;
-  animation-delay: 0s;
 }
 
 .floating-icon-2 {
   top: 60%;
   right: 20%;
-  animation-delay: 1s;
 }
 
 .floating-icon-3 {
   bottom: 30%;
   left: 20%;
-  animation-delay: 2s;
 }
 
 .main-icon {
@@ -199,91 +192,36 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  animation: pulse 3s ease-in-out infinite;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-20px) rotate(5deg);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.1);
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes fadeInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
+/* Removed animation keyframes for simpler design */
 
 
 
 .cta-section {
-  background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 50%, #68a085 100%);
+  background: #4a7c59;
 }
 
 .cta-content {
-  background: linear-gradient(135deg, rgba(45, 90, 39, 0.9) 0%, rgba(104, 160, 133, 0.8) 100%);
-  backdrop-filter: blur(10px);
+  background: rgba(45, 90, 39, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .btn-success {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: #28a745;
   border: none;
-  transition: all 0.3s ease;
 }
 
 .btn-success:hover {
-  background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+  background: #20c997;
 }
 
 .btn-outline-light:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+  /* Simplified hover effect */
 }
 
 .hero-image {
-  animation: float 3s ease-in-out infinite;
+  /* Removed animation */
 }
 
 @media (max-width: 768px) {
@@ -305,7 +243,6 @@ export default {
   
   .floating-icon {
     position: absolute;
-    animation: float 3s ease-in-out infinite;
   }
   
   .floating-icon-1 {
@@ -329,7 +266,6 @@ export default {
   .main-icon {
     position: static;
     transform: none;
-    animation: pulse 2s ease-in-out infinite;
   }
   
   .main-icon i {

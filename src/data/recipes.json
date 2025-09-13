@@ -38,7 +38,9 @@
       "kalamata olives": "green olives or sun-dried tomatoes",
       "vegetable broth": "chicken broth or water"
     },
-    "tags": ["vegetarian", "gluten-free", "mediterranean", "healthy"]
+    "tags": ["vegetarian", "gluten-free", "mediterranean", "healthy"],
+    "averageRating": 4.2,
+    "totalRatings": 15
   },
   {
     "id": 2,
@@ -80,7 +82,9 @@
       "heavy cream": "half-and-half or cashew cream",
       "parmesan": "pecorino romano or nutritional yeast"
     },
-    "tags": ["pasta", "chicken", "creamy", "comfort-food"]
+    "tags": ["pasta", "chicken", "creamy", "comfort-food"],
+    "averageRating": 4.5,
+    "totalRatings": 23
   },
   {
     "id": 3,
@@ -122,7 +126,9 @@
       "soy sauce": "tamari or coconut aminos",
       "sesame oil": "peanut oil or avocado oil"
     },
-    "tags": ["vegetarian", "vegan", "asian", "quick", "healthy"]
+    "tags": ["vegetarian", "vegan", "asian", "quick", "healthy"],
+    "averageRating": 4.0,
+    "totalRatings": 8
   },
   {
     "id": 4,
@@ -167,7 +173,9 @@
       "sour cream": "Greek yogurt or avocado",
       "shredded cheese": "queso fresco or vegan cheese"
     },
-    "tags": ["mexican", "beef", "quick", "family-friendly"]
+    "tags": ["mexican", "beef", "quick", "family-friendly"],
+    "averageRating": 4.3,
+    "totalRatings": 12
   },
   {
     "id": 5,
@@ -208,7 +216,9 @@
       "fresh herbs": "dried herbs (use 1/3 amount)",
       "butter": "olive oil or ghee"
     },
-    "tags": ["seafood", "healthy", "low-carb", "gluten-free"]
+    "tags": ["seafood", "healthy", "low-carb", "gluten-free"],
+    "averageRating": 4.7,
+    "totalRatings": 19
   },
   {
     "id": 6,
@@ -249,6 +259,8 @@
       "chocolate chips": "white chocolate chips or dried cranberries",
       "eggs": "flax eggs or applesauce"
     },
-    "tags": ["dessert", "cookies", "chocolate", "baking"]
+    "tags": ["dessert", "cookies", "chocolate", "baking"],
+    "averageRating": 4.8,
+    "totalRatings": 31
   }
 ]

@@ -225,29 +225,67 @@
             </div>
           </div>
 
-          <!-- Demo Credentials -->
-          <div class="card mt-4 border-warning">
-            <div class="card-header bg-warning text-dark">
+          <!-- Demo Users & Quick Login -->
+          <div class="card mt-4 border-info">
+            <div class="card-header bg-info text-white">
               <h6 class="mb-0">
-                <i class="fas fa-info-circle me-2"></i>Demo Credentials
+                <i class="fas fa-users me-2"></i>Demo Users - Quick Login
               </h6>
             </div>
             <div class="card-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <strong>Regular User:</strong><br>
-                  <small class="text-muted">
-                    Email: user@demo.com<br>
-                    Password: password123
-                  </small>
-                </div>
-                <div class="col-md-6">
-                  <strong>Administrator:</strong><br>
-                  <small class="text-muted">
-                    Email: admin@demo.com<br>
-                    Password: admin123
-                  </small>
-                </div>
+              <p class="text-muted small mb-3">
+                <i class="fas fa-lightbulb me-1"></i>
+                Try different user roles to see how the system adapts to different permissions and features.
+              </p>
+              
+              <div class="row g-3 justify-content-center">
+                 <!-- Student Demo User -->
+                 <div class="col-md-5">
+                   <div class="demo-user-card p-3 border rounded">
+                     <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-graduation-cap text-primary me-2"></i>
+                <strong>User</strong>
+              </div>
+              <div class="demo-credentials mb-2">
+                <small class="text-muted">
+                  <strong>Robby</strong><br>
+                  robby@gmail.com<br>
+                  Password: Robby20010922
+                </small>
+              </div>
+                     <button 
+                       @click="quickLogin('student')"
+                       class="btn btn-outline-primary btn-sm w-100"
+                       :disabled="isSubmitting"
+                     >
+                       <i class="fas fa-sign-in-alt me-1"></i>Quick Login
+                     </button>
+                   </div>
+                 </div>
+                 
+                 <!-- Nutritionist Demo User -->
+                 <div class="col-md-5">
+                   <div class="demo-user-card p-3 border rounded">
+                     <div class="d-flex align-items-center mb-2">
+                       <i class="fas fa-user-md text-success me-2"></i>
+                       <strong>Nutritionist</strong>
+                     </div>
+                     <div class="demo-credentials mb-2">
+                <small class="text-muted">
+                  <strong>Dr. Emily Chen</strong><br>
+                  emily.chen@gmail.com<br>
+                  Password: nutritionist123
+                </small>
+              </div>
+                     <button 
+                       @click="quickLogin('nutritionist')"
+                       class="btn btn-outline-success btn-sm w-100"
+                       :disabled="isSubmitting"
+                     >
+                       <i class="fas fa-sign-in-alt me-1"></i>Quick Login
+                     </button>
+                   </div>
+                 </div>
               </div>
             </div>
           </div>
@@ -258,6 +296,9 @@
 </template>
 
 <script>
+import userStorage from '@/utils/userStorage.js'
+import passwordHash from '@/utils/passwordHash.js'
+
 export default {
   name: 'Auth',
   data() {
@@ -274,7 +315,31 @@ export default {
         agreeTerms: false,
         rememberMe: false
       },
-      errors: {}
+      errors: {},
+      // Demo users data
+      demoUsers: {
+        student: {
+          firstName: 'Robby',
+          lastName: '',
+          email: 'robby@gmail.com',
+          password: 'Robby20010922',
+          role: 'student'
+        },
+        nutritionist: {
+          firstName: 'Emily',
+          lastName: 'Chen',
+          email: 'emily.chen@gmail.com',
+          password: 'nutritionist123',
+          role: 'nutritionist'
+        },
+        administrator: {
+          firstName: 'Admin',
+          lastName: 'User',
+          email: 'admin@fit.edu',
+          password: 'admin123',
+          role: 'administrator'
+        }
+      }
     }
   },
   computed: {
@@ -360,6 +425,16 @@ export default {
         this.errors.password = 'Password must be at least 8 characters long'
         return false
       }
+      
+      // Enhanced password validation for registration
+      if (!this.isLogin) {
+        const strength = passwordHash.checkPasswordStrength(password)
+        if (strength.score < 3) {
+          this.errors.password = 'Password is too weak. Please include uppercase, lowercase, numbers, and special characters.'
+          return false
+        }
+      }
+      
       delete this.errors.password
       return true
     },
@@ -438,29 +513,44 @@ export default {
       this.isSubmitting = true
       
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        let result
         
-        // Simulate successful authentication
-        const userData = {
-          email: this.form.email,
-          fullName: this.form.fullName || 'User',
-          role: this.form.userRole,
-          isAuthenticated: true
+        if (this.isLogin) {
+          // Handle login
+          result = await userStorage.loginUser(this.form.email, this.form.password)
+        } else {
+          // Handle registration
+          const [firstName, ...lastNameParts] = this.form.fullName.trim().split(' ')
+          const lastName = lastNameParts.join(' ') || ''
+          
+          const userData = {
+            email: this.form.email,
+            password: this.form.password,
+            firstName: firstName,
+            lastName: lastName,
+            role: this.form.userRole
+          }
+          
+          result = await userStorage.registerUser(userData)
         }
         
-        // Store user data (in a real app, this would be handled by a state management system)
-        localStorage.setItem('userData', JSON.stringify(userData))
-        
-        // Show success message
-        alert(`${this.isLogin ? 'Login' : 'Registration'} successful! Welcome ${userData.fullName}!`)
-        
-        // Redirect to home page
-        this.$router.push('/')
+        if (result.success) {
+          // Save user session
+          userStorage.saveCurrentUser(result.user)
+          
+          // Show success message
+          this.showSuccessMessage(result.message, result.user)
+          
+          // Redirect to home page
+          this.$router.push('/')
+        } else {
+          // Show error message
+          this.showErrorMessage(result.message)
+        }
         
       } catch (error) {
         console.error('Authentication error:', error)
-        alert('An error occurred. Please try again.')
+        this.showErrorMessage('An unexpected error occurred. Please try again.')
       } finally {
         this.isSubmitting = false
       }
@@ -480,7 +570,90 @@ export default {
     
     clearErrors() {
       this.errors = {}
+    },
+    
+    showSuccessMessage(message, user) {
+      const welcomeText = user ? `Welcome ${user.firstName}!` : 'Welcome!'
+      alert(`${message} ${welcomeText}`)
+    },
+    
+    showErrorMessage(message) {
+      alert(`Error: ${message}`)
+    },
+    
+    checkPasswordStrength(password) {
+      return passwordHash.checkPasswordStrength(password)
+    },
+    
+    // Quick login method for demo users
+    async quickLogin(userType) {
+      try {
+        this.isSubmitting = true
+        this.clearErrors()
+        
+        const demoUser = this.demoUsers[userType]
+        if (!demoUser) {
+          this.showErrorMessage('Demo user not found')
+          return
+        }
+        
+        // Set form to login mode
+        this.isLogin = true
+        
+        // Fill form with demo user credentials
+        this.form.email = demoUser.email
+        this.form.password = demoUser.password
+        
+        // Attempt login
+        const result = await userStorage.loginUser(demoUser.email, demoUser.password)
+        
+        if (result.success) {
+          this.showSuccessMessage('Login successful!', result.user)
+          
+          // Redirect to home page
+          setTimeout(() => {
+            this.$router.push('/')
+          }, 1500)
+        } else {
+          this.showErrorMessage(result.message || 'Login failed')
+        }
+      } catch (error) {
+        console.error('Quick login error:', error)
+        this.showErrorMessage('An error occurred during login')
+      } finally {
+        this.isSubmitting = false
+      }
+    },
+    
+    // Pre-register demo users
+    async preRegisterDemoUsers() {
+      try {
+        for (const [userType, userData] of Object.entries(this.demoUsers)) {
+          // Check if user already exists
+          const existingUsers = userStorage.getAllUsers()
+          const userExists = existingUsers.some(user => user.email === userData.email)
+          
+          if (!userExists) {
+            // Register the demo user
+            await userStorage.registerUser(
+              userData.firstName,
+              userData.lastName,
+              userData.email,
+              userData.password,
+              userData.role
+            )
+            console.log(`Demo user registered: ${userData.email}`)
+          }
+        }
+      } catch (error) {
+        console.error('Error pre-registering demo users:', error)
+      }
     }
+  },
+  
+  // Pre-register demo users when component mounts
+  async mounted() {
+    await this.preRegisterDemoUsers()
   }
 }
 </script>
@@ -499,34 +672,26 @@ export default {
 }
 
 .card-header {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+  background: #007bff !important;
   border: none;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  background: #007bff;
   border: none;
-  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-}
-
-.btn-outline-primary {
-  transition: all 0.3s ease;
+  background: #0056b3;
 }
 
 .btn-outline-primary:hover {
-  transform: translateY(-1px);
+  /* Simplified hover effect */
 }
 
 .form-control {
   border-radius: 0.5rem;
   border: 2px solid #e9ecef;
-  transition: all 0.3s ease;
 }
 
 .form-control:focus {
@@ -545,7 +710,6 @@ export default {
 .form-select {
   border-radius: 0.5rem;
   border: 2px solid #e9ecef;
-  transition: all 0.3s ease;
 }
 
 .form-select:focus {
@@ -564,6 +728,31 @@ export default {
 .spinner-border-sm {
   width: 1rem;
   height: 1rem;
+}
+
+/* Demo user cards styling */
+.demo-user-card {
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+  border: 1px solid #dee2e6 !important;
+}
+
+.demo-user-card:hover {
+  background-color: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.demo-credentials {
+  min-height: 60px;
+}
+
+.demo-user-card .btn {
+  transition: all 0.2s ease;
+}
+
+.demo-user-card .btn:hover {
+  transform: translateY(-1px);
 }
 
 @media (max-width: 768px) {

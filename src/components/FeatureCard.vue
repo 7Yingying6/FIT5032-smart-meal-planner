@@ -35,21 +35,14 @@ export default {
 <style scoped>
 .feature-card {
   background: white;
-  transition: all 0.3s ease;
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .feature-icon-wrapper {
   margin-bottom: 1rem;
-  transition: transform 0.3s ease;
-}
-
-.feature-card:hover .feature-icon-wrapper {
-  transform: scale(1.1);
 }
 </style>

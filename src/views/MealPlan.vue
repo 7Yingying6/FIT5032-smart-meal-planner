@@ -362,31 +362,19 @@ export default {
 
 .summary-stat {
   padding: 1rem;
-  transition: transform 0.2s ease;
-}
-
-.summary-stat:hover {
-  transform: translateY(-2px);
 }
 
 .meal-card {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   border: none;
 }
 
 .meal-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .meal-image {
   height: 200px;
   object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.meal-card:hover .meal-image {
-  transform: scale(1.05);
 }
 
 .meal-stats {
@@ -410,17 +398,16 @@ export default {
 }
 
 .bg-success {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+  background: #28a745 !important;
 }
 
 .btn-success {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: #28a745;
   border: none;
 }
 
 .btn-success:hover {
-  background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
-  transform: translateY(-1px);
+  background: #218838;
 }
 
 @media (max-width: 768px) {

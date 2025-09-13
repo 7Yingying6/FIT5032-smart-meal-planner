@@ -69,6 +69,32 @@
               </div>
             </div>
             
+            <!-- Recipe Rating -->
+            <div class="recipe-rating mb-4">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <h6 class="mb-2">Average Rating:</h6>
+                  <StarRating 
+                    :recipe-id="recipe.id"
+                    :average-rating="currentRating.averageRating"
+                    :total-ratings="currentRating.totalRatings"
+                    mode="display"
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <h6 class="mb-2">Rate this recipe:</h6>
+                  <StarRating 
+                    :recipe-id="recipe.id"
+                    :average-rating="currentRating.averageRating"
+                    :total-ratings="currentRating.totalRatings"
+                    mode="interactive"
+                    :show-comment="true"
+                    @rating-updated="handleRatingUpdate"
+                  />
+                </div>
+              </div>
+            </div>
+            
             <!-- Recipe Tags -->
             <div class="recipe-tags mb-4">
               <h6 class="mb-2">Tags:</h6>
@@ -161,6 +187,51 @@
         </div>
       </div>
 
+      <!-- User Reviews Section -->
+      <div class="row mt-4" v-if="userReviews.length > 0">
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+              <h4 class="card-title mb-0">
+                <i class="fas fa-comments me-2"></i>User Reviews ({{ userReviews.length }})
+              </h4>
+            </div>
+            <div class="card-body">
+              <div class="reviews-container" style="max-height: 400px; overflow-y: auto;">
+                <div 
+                  v-for="review in userReviews" 
+                  :key="review.userId + review.timestamp"
+                  class="review-item mb-3 p-3 border rounded"
+                >
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="d-flex align-items-center">
+                      <div class="user-avatar me-2">
+                        <i class="fas fa-user-circle fa-2x text-muted"></i>
+                      </div>
+                      <div>
+                        <div class="fw-bold">User {{ review.userId.slice(-4) }}</div>
+                        <div class="small text-muted">{{ formatDate(review.timestamp) }}</div>
+                      </div>
+                    </div>
+                    <div class="rating-stars">
+                      <StarRating 
+                        :recipe-id="recipe.id"
+                        :average-rating="review.rating"
+                        :total-ratings="1"
+                        mode="display"
+                      />
+                    </div>
+                  </div>
+                  <div v-if="review.comment" class="review-comment">
+                    <p class="mb-0">{{ review.comment }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Alternatives Section -->
       <div class="row mt-4" v-if="recipe.alternatives">
         <div class="col-12">
@@ -241,12 +312,22 @@
 
 <script>
 import recipesData from '@/data/recipes.json'
+import StarRating from '@/components/StarRating.vue'
+import { getRecipeRatings } from '@/utils/ratingStorage'
 
 export default {
   name: 'RecipeDetail',
+  components: {
+    StarRating
+  },
   data() {
     return {
-      recipes: recipesData
+      recipes: recipesData,
+      currentRating: {
+        averageRating: 0,
+        totalRatings: 0
+      },
+      userReviews: []
     }
   },
   computed: {
@@ -267,6 +348,9 @@ export default {
       return this.recipes[this.currentIndex + 1]
     }
   },
+  mounted() {
+    this.loadRatingData()
+  },
   methods: {
     goToPreviousRecipe() {
       if (this.previousRecipe) {
@@ -277,12 +361,51 @@ export default {
       if (this.nextRecipe) {
         this.$router.push(`/recipe/${this.nextRecipe.id}`)
       }
+    },
+    loadRatingData() {
+      if (this.recipe) {
+        const ratingData = getRecipeRatings(this.recipe.id)
+        this.currentRating = {
+          averageRating: ratingData.averageRating || this.recipe.averageRating || 0,
+          totalRatings: ratingData.totalRatings || this.recipe.totalRatings || 0
+        }
+        this.userReviews = ratingData.ratings || []
+      }
+    },
+    handleRatingUpdate(data) {
+      // Reload rating data after user submits/updates rating
+      this.loadRatingData()
+      
+      // Show success message
+      if (data.removed) {
+        this.showMessage('Rating removed successfully!', 'success')
+      } else {
+        this.showMessage('Thank you for your rating!', 'success')
+      }
+    },
+    formatDate(timestamp) {
+      const date = new Date(timestamp)
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      })
+    },
+    showMessage(message, type = 'info') {
+      // Simple message display - could be enhanced with toast notifications
+      console.log(`${type.toUpperCase()}: ${message}`)
     }
   },
   watch: {
     '$route'() {
       // Scroll to top when route changes
       window.scrollTo(0, 0)
+      // Reload rating data for new recipe
+      this.loadRatingData()
+    },
+    recipe() {
+      // Reload rating data when recipe changes
+      this.loadRatingData()
     }
   }
 }
@@ -304,11 +427,6 @@ export default {
   width: 100%;
   height: 400px;
   object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.recipe-main-image:hover {
-  transform: scale(1.05);
 }
 
 .image-overlay {
@@ -318,13 +436,11 @@ export default {
 }
 
 .stat-card {
-  transition: transform 0.2s ease;
   border: 1px solid #e9ecef;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .ingredients-list {
@@ -333,7 +449,6 @@ export default {
 }
 
 .ingredient-item {
-  transition: background-color 0.2s ease;
   border: 1px solid transparent;
 }
 
@@ -355,12 +470,10 @@ export default {
 
 .instruction-item {
   border-left: 4px solid #28a745;
-  transition: all 0.2s ease;
 }
 
 .instruction-item:hover {
-  background-color: #e8f5e8 !important;
-  border-left-color: #20c997;
+  background-color: #f8f9fa !important;
 }
 
 .step-number {
@@ -373,15 +486,12 @@ export default {
 }
 
 .alternative-item {
-  transition: all 0.2s ease;
   background-color: #fff;
 }
 
 .alternative-item:hover {
   background-color: #fff3cd;
   border-color: #ffc107 !important;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .recipe-tags .badge {
