@@ -39,10 +39,20 @@ export function getRecipeRatings(recipeId) {
  */
 export function addRating(recipeId, rating, userId, comment = '') {
   try {
+    // Enhanced validation
+    if (!recipeId || !userId) {
+      return { success: false, error: 'Recipe ID and User ID are required' }
+    }
+    
+    // Validate rating is a number
+    const numRating = Number(rating)
+    if (isNaN(numRating) || !Number.isInteger(numRating)) {
+      return { success: false, error: 'Rating must be a valid number' }
+    }
+    
     // Validate rating range
-    if (rating < 1 || rating > 5) {
-      console.error('Rating must be between 1-5')
-      return false
+    if (numRating < 1 || numRating > 5) {
+      return { success: false, error: 'Rating must be between 1-5' }
     }
 
     const allRatings = getAllRatings()
@@ -50,15 +60,16 @@ export function addRating(recipeId, rating, userId, comment = '') {
     
     // Check if user has already rated
     const existingRatingIndex = recipeRatings.ratings.findIndex(r => r.userId === userId)
+    const isUpdate = existingRatingIndex >= 0
     
     const newRating = {
       userId,
-      rating,
-      comment,
+      rating: numRating,
+      comment: comment || '',
       timestamp: new Date().toISOString()
     }
     
-    if (existingRatingIndex >= 0) {
+    if (isUpdate) {
       // Update existing rating
       recipeRatings.ratings[existingRatingIndex] = newRating
     } else {
@@ -74,10 +85,18 @@ export function addRating(recipeId, rating, userId, comment = '') {
     allRatings[recipeId] = recipeRatings
     localStorage.setItem('recipeRatings', JSON.stringify(allRatings))
     
-    return true
+    return { 
+      success: true, 
+      isUpdate,
+      message: isUpdate ? 'Rating updated successfully!' : 'Rating submitted successfully!',
+      data: {
+        averageRating: recipeRatings.averageRating,
+        totalRatings: recipeRatings.totalRatings
+      }
+    }
   } catch (error) {
     console.error('Failed to add rating:', error)
-    return false
+    return { success: false, error: 'An unexpected error occurred' }
   }
 }
 
@@ -93,12 +112,13 @@ export function getUserRating(recipeId, userId) {
 }
 
 /**
- * Remove user rating
+ * Remove user rating (admin function to remove any rating)
  * @param {string|number} recipeId - Recipe ID
  * @param {string} userId - User ID
- * @returns {boolean} Success status
+ * @param {boolean} isAdmin - Whether this is an admin operation
+ * @returns {Object} Operation result with success status and message
  */
-export function removeRating(recipeId, userId) {
+export function removeRating(recipeId, userId, isAdmin = false) {
   try {
     const allRatings = getAllRatings()
     const recipeRatings = getRecipeRatings(recipeId)

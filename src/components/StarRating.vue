@@ -10,8 +10,11 @@
           :class="getStarClass(star)"
         ></i>
       </div>
-      <span class="rating-text text-muted small">
+      <span v-if="totalRatings > 0" class="rating-text text-muted small">
         {{ averageRating.toFixed(1) }} ({{ totalRatings }} {{ totalRatings === 1 ? 'review' : 'reviews' }})
+      </span>
+      <span v-else class="rating-text text-muted small fst-italic">
+        <i class="fas fa-star-half-alt me-1"></i>No ratings yet - Be the first to rate!
       </span>
     </div>
 
@@ -60,13 +63,25 @@
           {{ isSubmitting ? 'Submitting...' : (existingRating ? 'Update Rating' : 'Submit Rating') }}
         </button>
         <button 
-          v-if="existingRating" 
+          v-if="canDeleteRating" 
           @click="removeRating" 
           class="btn btn-outline-danger btn-sm"
           :disabled="isSubmitting"
         >
           Remove
         </button>
+      </div>
+      
+      <!-- Success message -->
+      <div v-if="successMessage" class="alert alert-success alert-dismissible fade show mt-2" role="alert">
+        <i class="fas fa-check-circle me-2"></i>{{ successMessage }}
+        <button type="button" class="btn-close" @click="successMessage = ''" aria-label="Close"></button>
+      </div>
+      
+      <!-- Error message -->
+      <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>{{ errorMessage }}
+        <button type="button" class="btn-close" @click="errorMessage = ''" aria-label="Close"></button>
       </div>
     </div>
   </div>
@@ -107,7 +122,20 @@ export default {
       hoverRating: 0,
       comment: '',
       isSubmitting: false,
-      existingRating: null
+      existingRating: null,
+      errorMessage: '',
+      successMessage: ''
+    }
+  },
+  computed: {
+    canDeleteRating() {
+      if (!this.existingRating) return false
+      
+      const user = userStorage.getCurrentUser()
+      if (!user) return false
+      
+      // Users can only delete their own ratings
+      return this.existingRating.userId === user.id
     }
   },
   mounted() {
@@ -135,6 +163,22 @@ export default {
       }
     },
     setRating(rating) {
+      // Clear any previous error messages
+      this.errorMessage = ''
+      
+      // Check if user is logged in
+      const user = userStorage.getCurrentUser()
+      if (!user) {
+        this.$router.push('/auth')
+        return
+      }
+      
+      // Validate rating range
+      if (rating < 1 || rating > 5) {
+        this.errorMessage = 'Please select a rating between 1 and 5 stars'
+        return
+      }
+      
       this.currentRating = rating
     },
     getRatingText(rating) {
@@ -158,28 +202,33 @@ export default {
       }
     },
     async submitRating() {
+      // Clear previous messages
+      this.errorMessage = ''
+      this.successMessage = ''
+      
       const user = userStorage.getCurrentUser()
       if (!user) {
-        alert('Please log in to rate recipes')
+        this.$router.push('/auth')
         return
       }
       
+      // Client-side validation
       if (this.currentRating === 0) {
-        alert('Please select a rating')
+        this.errorMessage = 'Please select a rating'
+        return
+      }
+      
+      if (this.currentRating < 1 || this.currentRating > 5) {
+        this.errorMessage = 'Rating must be between 1 and 5 stars'
         return
       }
       
       this.isSubmitting = true
       
       try {
-        const success = addRating(this.recipeId, this.currentRating, user.id, this.comment)
-        if (success) {
-          this.$emit('rating-updated', {
-            recipeId: this.recipeId,
-            rating: this.currentRating,
-            comment: this.comment
-          })
-          
+        const result = addRating(this.recipeId, this.currentRating, user.id, this.comment)
+        
+        if (result.success) {
           // Update existing rating reference
           this.existingRating = {
             userId: user.id,
@@ -188,21 +237,38 @@ export default {
             timestamp: new Date().toISOString()
           }
           
+          // Emit rating update event with new data
+          this.$emit('rating-updated', {
+            recipeId: this.recipeId,
+            rating: this.currentRating,
+            comment: this.comment,
+            averageRating: result.data.averageRating,
+            totalRatings: result.data.totalRatings,
+            isUpdate: result.isUpdate
+          })
+          
           // Show success message
-          this.showSuccessMessage()
+          this.showSuccessMessage(result.message)
         } else {
-          alert('Failed to submit rating. Please try again.')
+          this.errorMessage = result.error || 'Failed to submit rating. Please try again.'
         }
       } catch (error) {
         console.error('Error submitting rating:', error)
-        alert('An error occurred. Please try again.')
+        this.errorMessage = 'An unexpected error occurred. Please try again.'
       } finally {
         this.isSubmitting = false
       }
     },
     async removeRating() {
+      // Clear previous messages
+      this.errorMessage = ''
+      this.successMessage = ''
+      
       const user = userStorage.getCurrentUser()
-      if (!user) return
+      if (!user) {
+        this.$router.push('/auth')
+        return
+      }
       
       if (!confirm('Are you sure you want to remove your rating?')) {
         return
@@ -212,6 +278,7 @@ export default {
       
       try {
         const success = removeUserRating(this.recipeId, user.id)
+        
         if (success) {
           this.currentRating = 0
           this.comment = ''
@@ -224,22 +291,21 @@ export default {
           
           this.showSuccessMessage('Rating removed successfully!')
         } else {
-          alert('Failed to remove rating. Please try again.')
+          this.errorMessage = 'Failed to remove rating. Please try again.'
         }
       } catch (error) {
         console.error('Error removing rating:', error)
-        alert('An error occurred. Please try again.')
+        this.errorMessage = 'An unexpected error occurred while removing rating.'
       } finally {
         this.isSubmitting = false
       }
     },
     showSuccessMessage(message = 'Rating submitted successfully!') {
-      // Simple success feedback - could be enhanced with toast notifications
-      const originalText = message
+      this.successMessage = message
+      // Auto-hide success message after 3 seconds
       setTimeout(() => {
-        // Could implement a toast notification system here
-        console.log(originalText)
-      }, 100)
+        this.successMessage = ''
+      }, 3000)
     }
   }
 }

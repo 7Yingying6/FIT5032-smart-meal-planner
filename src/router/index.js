@@ -4,6 +4,7 @@ import Recipes from '../views/Recipes.vue'
 import RecipeDetail from '../views/RecipeDetail.vue'
 import MealPlan from '../views/MealPlan.vue'
 import Auth from '../views/Auth.vue'
+import userStorage from '../utils/userStorage'
 
 const routes = [
   {
@@ -25,7 +26,8 @@ const routes = [
   {
     path: '/meal-plan',
     name: 'MealPlan',
-    component: MealPlan
+    component: MealPlan,
+    meta: { requiresAuth: true }
   },
   {
     path: '/auth',
@@ -37,6 +39,25 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+// Navigation guard for authentication
+router.beforeEach((to, from, next) => {
+  // Check if route requires authentication
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    const user = userStorage.getCurrentUser()
+    if (!user) {
+      // Redirect to auth page if not logged in
+      next({
+        path: '/auth',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
 })
 
 export default router
