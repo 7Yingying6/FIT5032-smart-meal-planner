@@ -90,6 +90,73 @@
       </div>
     </section>
 
+    <!-- Top Rated Recipes Section -->
+    <section class="top-rated-section py-5">
+      <div class="container">
+        <div class="row text-center mb-5">
+          <div class="col-12">
+            <h2 class="display-5 fw-bold mb-4 text-primary">Top Rated Recipes</h2>
+            <p class="lead text-muted fs-4">Discover our most loved recipes by the community</p>
+          </div>
+        </div>
+        
+        <div class="row g-4" v-if="topRatedRecipes.length > 0">
+          <div 
+            v-for="recipe in topRatedRecipes" 
+            :key="recipe.id" 
+            class="col-12 col-md-6 col-lg-4"
+          >
+            <div class="recipe-card h-100 shadow-sm" @click="goToRecipe(recipe.id)">
+              <div class="recipe-image-container">
+                <img 
+                  :src="recipe.image" 
+                  :alt="recipe.title"
+                  class="recipe-image"
+                >
+                <div class="recipe-badge">
+                  <span class="badge bg-warning text-dark">
+                    <i class="fas fa-star me-1"></i>{{ getRating(recipe.id).toFixed(1) }}
+                  </span>
+                </div>
+              </div>
+              <div class="card-body p-3">
+                <h5 class="card-title mb-2">{{ recipe.title }}</h5>
+                <p class="card-text text-muted small mb-3">{{ recipe.description }}</p>
+                <div class="recipe-meta d-flex justify-content-between align-items-center">
+                  <span class="badge bg-primary">{{ recipe.category }}</span>
+                  <small class="text-muted">
+                    <i class="fas fa-clock me-1"></i>{{ recipe.cookingTime }}min
+                  </small>
+                </div>
+                <div class="mt-2">
+                  <small class="text-muted">
+                    <i class="fas fa-users me-1"></i>{{ getRatingCount(recipe.id) }} reviews
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div v-else class="row">
+          <div class="col-12 text-center py-4">
+            <p class="text-muted">No rated recipes yet. Be the first to rate our recipes!</p>
+            <router-link to="/recipes" class="btn btn-primary">
+              <i class="fas fa-utensils me-2"></i>Browse Recipes
+            </router-link>
+          </div>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-12 text-center">
+            <router-link to="/recipes" class="btn btn-outline-primary btn-lg">
+              <i class="fas fa-arrow-right me-2"></i>View All Recipes
+            </router-link>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Call to Action Section -->
     <section class="cta-section py-5">
       <div class="container">
@@ -114,11 +181,57 @@
 
 <script>
 import FeatureCard from '@/components/FeatureCard.vue'
+import recipesData from '@/data/recipes.json'
+import { getRecipeRatings } from '@/utils/ratingStorage'
 
 export default {
   name: 'Home',
   components: {
     FeatureCard
+  },
+  data() {
+    return {
+      topRatedRecipes: []
+    }
+  },
+  computed: {
+    // Get top rated recipes (3-6 items)
+    sortedRecipesByRating() {
+      return recipesData
+        .map(recipe => ({
+          ...recipe,
+          averageRating: this.getRating(recipe.id),
+          ratingCount: this.getRatingCount(recipe.id)
+        }))
+        .filter(recipe => recipe.ratingCount > 0) // Only show recipes with ratings
+        .sort((a, b) => {
+          // Sort by average rating first, then by rating count
+          if (b.averageRating !== a.averageRating) {
+            return b.averageRating - a.averageRating
+          }
+          return b.ratingCount - a.ratingCount
+        })
+        .slice(0, 6) // Take top 6
+    }
+  },
+  mounted() {
+    this.loadTopRatedRecipes()
+  },
+  methods: {
+    loadTopRatedRecipes() {
+      this.topRatedRecipes = this.sortedRecipesByRating
+    },
+    getRating(recipeId) {
+      const ratingData = getRecipeRatings(recipeId)
+      return ratingData.averageRating || 0
+    },
+    getRatingCount(recipeId) {
+      const ratingData = getRecipeRatings(recipeId)
+      return ratingData.totalRatings || 0
+    },
+    goToRecipe(recipeId) {
+      this.$router.push(`/recipe/${recipeId}`)
+    }
   }
 }
 </script>
@@ -196,7 +309,64 @@ export default {
 
 /* Removed animation keyframes for simpler design */
 
+/* Top Rated Recipes Section */
+.top-rated-section {
+  background: #f8f9fa;
+}
 
+.recipe-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid #e9ecef;
+}
+
+.recipe-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.recipe-image-container {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.recipe-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.recipe-card:hover .recipe-image {
+  transform: scale(1.05);
+}
+
+.recipe-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+}
+
+.recipe-badge .badge {
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.recipe-meta {
+  font-size: 0.9rem;
+}
+
+.recipe-meta .badge {
+  font-size: 0.75rem;
+  padding: 0.4rem 0.6rem;
+}
 
 .cta-section {
   background: #4a7c59;

@@ -29,7 +29,7 @@
                 <i class="fas fa-filter me-2"></i>Filter Recipes
               </h5>
               <div class="row g-3">
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label for="categoryFilter" class="form-label">Category</label>
                   <select 
                     id="categoryFilter" 
@@ -45,7 +45,7 @@
                     <option value="Dessert">Dessert</option>
                   </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label for="timeFilter" class="form-label">Cooking Time</label>
                   <select 
                     id="timeFilter" 
@@ -58,7 +58,7 @@
                     <option value="45">&lt;= 45 minutes</option>
                   </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label for="difficultyFilter" class="form-label">Difficulty</label>
                   <select 
                     id="difficultyFilter" 
@@ -69,6 +69,18 @@
                     <option value="Easy">Easy</option>
                     <option value="Medium">Medium</option>
                     <option value="Hard">Hard</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="sortFilter" class="form-label">Sort By</label>
+                  <select 
+                    id="sortFilter" 
+                    v-model="sortBy" 
+                    class="form-select"
+                  >
+                    <option value="default">Default</option>
+                     <option value="Rating: High to Low">Rating: High to Low</option>
+                     <option value="Most Reviewed">Most Reviewed</option>
                   </select>
                 </div>
               </div>
@@ -121,6 +133,7 @@
 <script>
 import recipesData from '@/data/recipes.json'
 import RecipeCard from '@/components/RecipeCard.vue'
+import { getRecipeRatings } from '@/utils/ratingStorage'
 
 export default {
   name: 'Recipes',
@@ -132,7 +145,8 @@ export default {
       recipes: recipesData,
       selectedCategory: '',
       maxCookingTime: '',
-      selectedDifficulty: ''
+      selectedDifficulty: '',
+      sortBy: 'default'
     }
   },
   computed: {
@@ -158,6 +172,21 @@ export default {
         filtered = filtered.filter(recipe => 
           recipe.difficulty === this.selectedDifficulty
         )
+      }
+      
+      // Sort recipes
+      if (this.sortBy === 'Rating: High to Low') {
+        filtered = filtered.sort((a, b) => {
+          const ratingA = a.averageRating || 0
+          const ratingB = b.averageRating || 0
+          return ratingB - ratingA
+        })
+      } else if (this.sortBy === 'Most Reviewed') {
+        filtered = filtered.sort((a, b) => {
+          const countA = a.totalRatings || 0
+          const countB = b.totalRatings || 0
+          return countB - countA
+        })
       }
       
       return filtered

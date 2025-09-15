@@ -71,27 +71,55 @@
             
             <!-- Recipe Rating -->
             <div class="recipe-rating mb-4">
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <h6 class="mb-2">Average Rating:</h6>
-                  <StarRating 
-                    :recipe-id="recipe.id"
-                    :average-rating="currentRating.averageRating"
-                    :total-ratings="currentRating.totalRatings"
-                    mode="display"
-                  />
+              <div class="row g-3">
+                <!-- Average Rating -->
+                <div class="col-md-4">
+                  <div class="rating-card text-center p-3 bg-light rounded">
+                    <i class="fas fa-star text-warning fs-4 mb-2"></i>
+                    <div class="fw-bold fs-5">{{ currentRating.averageRating.toFixed(1) }}</div>
+                    <small class="text-muted">Average Rating</small>
+                  </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <h6 class="mb-2">Rate this recipe:</h6>
-                  <StarRating 
-                    :recipe-id="recipe.id"
-                    :average-rating="currentRating.averageRating"
-                    :total-ratings="currentRating.totalRatings"
-                    mode="interactive"
-                    :show-comment="true"
-                    @rating-updated="handleRatingUpdate"
-                  />
+                
+                <!-- Total Reviews -->
+                <div class="col-md-4">
+                  <div class="rating-card text-center p-3 bg-light rounded">
+                    <i class="fas fa-users text-info fs-4 mb-2"></i>
+                    <div class="fw-bold fs-5">{{ currentRating.totalRatings }}</div>
+                    <small class="text-muted">Total Reviews</small>
+                  </div>
                 </div>
+                
+                <!-- My Rating -->
+                <div class="col-md-4">
+                  <div class="rating-card text-center p-3 bg-light rounded">
+                    <i class="fas fa-user text-primary fs-4 mb-2"></i>
+                    <div v-if="currentUser" class="fw-bold fs-5">
+                      <span v-if="myRating">
+                        {{ myRating.rating }}
+                        <i class="fas fa-star text-warning ms-1"></i>
+                      </span>
+                      <span v-else class="text-muted">Not Rated</span>
+                    </div>
+                    <div v-else class="fw-bold fs-6">
+                      <router-link to="/auth" class="text-decoration-none">Login to Rate</router-link>
+                    </div>
+                    <small class="text-muted">My Rating</small>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Interactive Rating (if logged in) -->
+              <div v-if="currentUser" class="mt-3">
+                <h6 class="mb-2">Rate this recipe:</h6>
+                <StarRating 
+                  :recipe-id="recipe.id"
+                  :average-rating="currentRating.averageRating"
+                  :total-ratings="currentRating.totalRatings"
+                  mode="interactive"
+                  :show-comment="true"
+                  @rating-updated="handleRatingUpdate"
+                />
               </div>
             </div>
 
@@ -314,7 +342,8 @@
 <script>
 import recipesData from '@/data/recipes.json'
 import StarRating from '@/components/StarRating.vue'
-import { getRecipeRatings } from '@/utils/ratingStorage'
+import { getRecipeRatings, getUserRating } from '@/utils/ratingStorage'
+import userStorage from '@/utils/userStorage'
 
 export default {
   name: 'RecipeDetail',
@@ -328,7 +357,9 @@ export default {
         averageRating: 0,
         totalRatings: 0
       },
-      userReviews: []
+      userReviews: [],
+      currentUser: null,
+      myRating: null
     }
   },
   computed: {
@@ -371,6 +402,16 @@ export default {
           totalRatings: ratingData.totalRatings || this.recipe.totalRatings || 0
         }
         this.userReviews = ratingData.ratings || []
+        
+        // Get current user
+        this.currentUser = userStorage.getCurrentUser()
+        
+        // Get user's rating for this recipe
+        if (this.currentUser) {
+          this.myRating = getUserRating(this.recipe.id, this.currentUser.id)
+        } else {
+          this.myRating = null
+        }
       }
     },
     handleRatingUpdate(data) {
@@ -441,6 +482,15 @@ export default {
 }
 
 .stat-card:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rating-card {
+  border: 1px solid #e9ecef;
+  transition: box-shadow 0.2s ease;
+}
+
+.rating-card:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
