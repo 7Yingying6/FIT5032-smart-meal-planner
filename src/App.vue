@@ -1,6 +1,19 @@
 <script setup>
+import { onMounted } from 'vue'
 import NavBar from '@/components/NavBar.vue'
 import AppFooter from '@/components/AppFooter.vue'
+import userStorage from '@/utils/userStorage.js'
+
+// Check user authentication status on app startup
+onMounted(() => {
+  // Force a check of user authentication status
+  const currentUser = userStorage.getCurrentUser()
+  if (currentUser) {
+    console.log('App: User session restored:', currentUser.firstName)
+  } else {
+    console.log('App: No active user session')
+  }
+})
 </script>
 
 <template>

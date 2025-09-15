@@ -541,8 +541,10 @@ export default {
           // Show success message
           this.showSuccessMessage(result.message, result.user)
           
-          // Redirect to home page
-          this.$router.push('/')
+          // Small delay to ensure localStorage is written before navigation
+          setTimeout(() => {
+            this.$router.push('/')
+          }, 100)
         } else {
           // Show error message
           this.showErrorMessage(result.message)
