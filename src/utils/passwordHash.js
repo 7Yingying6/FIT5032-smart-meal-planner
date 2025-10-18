@@ -1,4 +1,4 @@
-// Password hashing utilities using Web Crypto API
+// Password hashing helpers using the Web Crypto API
 // Compliant with FIT5032 frontend course requirements
 
 /**
@@ -52,11 +52,11 @@ class PasswordHash {
    */
   async hashPassword(password, salt) {
     try {
-      // Convert password to ArrayBuffer
+      // Convert the password to ArrayBuffer
       const encoder = new TextEncoder();
       const passwordBuffer = encoder.encode(password);
 
-      // Import password as key material
+      // Import the password as key material
       const keyMaterial = await crypto.subtle.importKey(
         'raw',
         passwordBuffer,
@@ -65,7 +65,7 @@ class PasswordHash {
         ['deriveBits']
       );
 
-      // Derive key using PBKDF2
+      // Derive a key using PBKDF2
       const derivedKey = await crypto.subtle.deriveBits(
         {
           name: 'PBKDF2',
@@ -80,7 +80,7 @@ class PasswordHash {
       return this.bufferToHex(derivedKey);
     } catch (error) {
       console.error('Password hashing failed:', error);
-      // Fallback to simple hash for compatibility
+      // Fallback simple hash (for compatibility)
       return this.simpleHash(password + this.bufferToHex(salt));
     }
   }

@@ -1,17 +1,17 @@
 <template>
   <div class="recipes-page">
-    <!-- Page Header -->
-    <div class="container-fluid bg-primary text-white py-4 mb-4">
+    <!-- Recipes: page header -->
+    <div class="container-fluid bg-success text-white py-4 mb-4">
       <div class="container">
         <div class="row align-items-center">
           <div class="col-md-8">
-            <h1 class="display-4 mb-2">
+            <h1 class="display-4 mb-2 page-title">
               <i class="fas fa-utensils me-3"></i>Recipe Collection
             </h1>
             <p class="lead mb-0">Discover delicious recipes for every occasion</p>
           </div>
           <div class="col-md-4 text-md-end">
-            <div class="badge bg-light text-primary fs-6">
+            <div class="badge bg-light text-success fs-6">
               {{ filteredRecipes.length }} recipes available
             </div>
           </div>
@@ -100,7 +100,7 @@
         </div>
       </div>
 
-      <!-- Recipes Grid -->
+      <!-- Grid of recipe cards -->
       <div class="row">
         <div 
           v-for="recipe in filteredRecipes" 
@@ -211,8 +211,24 @@ export default {
   background-color: #f8f9fa;
 }
 
-.bg-primary {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+.bg-success {
+  background: linear-gradient(135deg, var(--color-green-600) 0%, var(--color-green-700) 100%) !important;
+}
+
+/* Use light green for the page title and enhance readability */
+.page-title {
+  color: var(--color-green-400) !important;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+}
+.page-title .fa-utensils {
+  color: var(--color-green-400);
+}
+
+.lead {
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.30);
 }
 
 @media (max-width: 768px) {

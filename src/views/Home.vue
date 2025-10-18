@@ -238,7 +238,7 @@ export default {
 
 <style scoped>
 .hero-section {
-  background: #4a7c59;
+  background: linear-gradient(180deg, #91dc95 0%, #1e5a2c 100%);
   min-height: 100vh;
   position: relative;
 }
@@ -249,7 +249,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(45, 90, 39, 0.7);
+  background: rgba(30, 90, 44, 0.35);
   z-index: 1;
 }
 
@@ -262,11 +262,11 @@ export default {
 }
 
 .hero-title {
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .hero-content {
-  /* Remove animation effects */
+  /* Simplified effects */
 }
 
 .executive-summary {
@@ -307,7 +307,7 @@ export default {
   transform: translate(-50%, -50%);
 }
 
-/* Removed animation keyframes for simpler design */
+/* No animation keyframes for a simpler design */
 
 /* Top Rated Recipes Section */
 .top-rated-section {
@@ -378,16 +378,20 @@ export default {
 }
 
 .btn-success {
-  background: #28a745;
+  background: var(--color-green-500);
   border: none;
 }
 
 .btn-success:hover {
-  background: #20c997;
+  background: var(--color-green-400);
+}
+
+.text-success {
+  color: var(--color-green-500) !important;
 }
 
 .btn-outline-light:hover {
-  /* Simplified hover effect */
+  background-color: rgba(255,255,255,0.15);
 }
 
 .hero-image {

@@ -41,13 +41,13 @@ const router = createRouter({
   routes
 })
 
-// Navigation guard for authentication
+// Auth navigation guard
 router.beforeEach((to, from, next) => {
-  // Check if route requires authentication
+  // Check if the route needs auth
   if (to.matched.some(record => record.meta.requiresAuth)) {
     const user = userStorage.getCurrentUser()
     if (!user) {
-      // Redirect to auth page if not logged in
+      // Redirect to the auth page if not logged in
       next({
         path: '/auth',
         query: { redirect: to.fullPath }

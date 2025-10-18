@@ -1,11 +1,11 @@
 <template>
   <div class="meal-plan-page">
-    <!-- Page Header -->
-    <div class="container-fluid bg-success text-white py-4 mb-4">
+    <!-- Page header: title and short context -->
+    <div class="container-fluid py-4 mb-4">
       <div class="container">
         <div class="row align-items-center">
           <div class="col-md-8">
-            <h1 class="display-4 mb-2">
+            <h1 class="display-4 mb-2 page-title">
               <i class="fas fa-calendar-alt me-3"></i>Weekly Meal Plan
             </h1>
             <p class="lead mb-0">Your personalized meal plan for the week</p>
@@ -213,8 +213,25 @@
         </div>
       </div>
 
+      <!-- Interactive Shopping Table Section -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-header bg-light">
+              <h5 class="mb-0 d-flex align-items-center">
+                <i class="fas fa-table me-2 text-success"></i>
+                Interactive Shopping Table
+              </h5>
+            </div>
+            <div class="card-body">
+              <InteractiveShoppingTable :shoppingList="shoppingTableData" />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Action Buttons -->
-      <div class="row mt-4 mb-4">
+      <div class="row mt-4 mb-2">
         <div class="col-12 text-center">
           <div class="d-flex justify-content-center gap-3 flex-wrap">
             <button @click="generateNewPlan" class="btn btn-success btn-lg">
@@ -223,9 +240,34 @@
             <button @click="savePlan" class="btn btn-primary btn-lg">
               <i class="fas fa-save me-2"></i>Save Plan
             </button>
-            <button @click="exportPlan" class="btn btn-outline-secondary btn-lg">
-              <i class="fas fa-download me-2"></i>Export Plan
+            <button @click="toggleExportOptions" class="btn btn-outline-secondary btn-lg">
+              <i class="fas fa-download me-2"></i>Export
+              <i class="fas" :class="showExportOptions ? 'fa-chevron-up ms-1' : 'fa-chevron-down ms-1'"></i>
             </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Options -->
+      <div v-if="showExportOptions" class="row mb-4">
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <button @click="exportShoppingListCSV" class="btn btn-outline-secondary">
+                  <i class="fas fa-file-csv me-2"></i>Shopping List (CSV)
+                </button>
+                <button @click="exportShoppingListPDF" class="btn btn-outline-secondary">
+                  <i class="fas fa-file-pdf me-2"></i>Shopping List (PDF)
+                </button>
+                <button @click="exportWeekPlanCSV" class="btn btn-outline-secondary">
+                  <i class="fas fa-file-csv me-2"></i>Weekly Plan (CSV)
+                </button>
+                <button @click="exportWeekPlanPDF" class="btn btn-outline-secondary">
+                  <i class="fas fa-file-pdf me-2"></i>Weekly Plan (PDF)
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -235,9 +277,16 @@
 
 <script>
 import recipesData from '@/data/recipes.json'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+import Papa from 'papaparse'
+import InteractiveShoppingTable from '@/components/InteractiveShoppingTable.vue'
 
 export default {
   name: 'MealPlan',
+  components: {
+    InteractiveShoppingTable
+  },
   data() {
     return {
       recipes: recipesData,
@@ -245,6 +294,7 @@ export default {
       isGenerating: false,
       isReplacing: null,
       showShoppingList: false,
+      showExportOptions: false,
       dayNames: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
     }
   },
@@ -265,78 +315,159 @@ export default {
       this.mealPlan.forEach(meal => {
         allIngredients.push(...meal.ingredients)
       })
-      // Remove duplicates and sort
       return [...new Set(allIngredients)].sort()
+    },
+    // Build shopping list data for InteractiveShoppingTable
+    shoppingTableData() {
+      const map = new Map()
+      this.mealPlan.forEach(meal => {
+        const ingList = meal.ingredients || []
+        ingList.forEach(ing => {
+          const key = (ing || '').trim()
+          if (!key) return
+          const current = map.get(key) || { count: 0, category: meal.category || 'General' }
+          current.count += 1
+          // preserve first non-empty category
+          if (!current.category && meal.category) current.category = meal.category
+          map.set(key, current)
+        })
+      })
+      return Array.from(map.entries())
+        .map(([ingredient, stat]) => ({
+          ingredient,
+          amount: String(stat.count),
+          category: stat.category || 'General'
+        }))
+        .sort((a, b) => a.ingredient.localeCompare(b.ingredient))
     }
   },
   methods: {
     generateNewPlan() {
       this.isGenerating = true
-      
-      // Simulate loading time for better UX
       setTimeout(() => {
         this.mealPlan = this.getRandomRecipes(5)
         this.isGenerating = false
       }, 1000)
     },
-    
     getRandomRecipes(count) {
       const shuffled = [...this.recipes].sort(() => 0.5 - Math.random())
       return shuffled.slice(0, count)
     },
-    
     replaceMeal(index) {
       this.isReplacing = index
-      
       setTimeout(() => {
-        // Get a different recipe that's not already in the meal plan
         const currentMealIds = this.mealPlan.map(meal => meal.id)
         const availableRecipes = this.recipes.filter(recipe => 
           !currentMealIds.includes(recipe.id)
         )
-        
         if (availableRecipes.length > 0) {
           const randomRecipe = availableRecipes[
             Math.floor(Math.random() * availableRecipes.length)
           ]
           this.mealPlan.splice(index, 1, randomRecipe)
         } else {
-          // If all recipes are used, just get a random one
           const randomRecipe = this.recipes[
             Math.floor(Math.random() * this.recipes.length)
           ]
           this.mealPlan.splice(index, 1, randomRecipe)
         }
-        
         this.isReplacing = null
       }, 500)
     },
-    
     getDayName(index) {
       return this.dayNames[index] || `Day ${index + 1}`
     },
-    
     toggleShoppingList() {
       this.showShoppingList = !this.showShoppingList
     },
-    
     savePlan() {
-      // Simulate saving to localStorage or backend
       const planData = {
         mealPlan: this.mealPlan,
         createdAt: new Date().toISOString()
       }
       localStorage.setItem('savedMealPlan', JSON.stringify(planData))
-      
-      // Show success message (you could use a toast library here)
       alert('Meal plan saved successfully!')
     },
-    
-    exportPlan() {
-      // TODO: Export functionality to be implemented later
-      console.log('Export plan functionality will be implemented in future version')
+    toggleExportOptions() {
+      this.showExportOptions = !this.showExportOptions
     },
-    
+    // --- Export helpers ---
+    buildShoppingListData() {
+      return this.uniqueIngredients.map(name => ({ Ingredient: name }))
+    },
+    buildWeekPlanData() {
+      return this.mealPlan.map((meal, index) => ({
+        Day: this.getDayName(index),
+        Title: meal.title,
+        Category: meal.category,
+        Servings: meal.servings,
+        Calories: meal.calories,
+        CookingTime: meal.cookingTime + ' min',
+        Ingredients: (meal.ingredients || []).join(', ')
+      }))
+    },
+    exportCSV(filename, rows) {
+      if (!rows || rows.length === 0) {
+        alert('Nothing to export. Please generate a plan first.')
+        return
+      }
+      const csv = Papa.unparse(rows)
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', filename)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    },
+    exportShoppingListCSV() {
+      const rows = this.buildShoppingListData()
+      this.exportCSV(`shopping-list-${new Date().toISOString().slice(0,10)}.csv`, rows)
+    },
+    exportWeekPlanCSV() {
+      const rows = this.buildWeekPlanData()
+      this.exportCSV(`weekly-meal-plan-${new Date().toISOString().slice(0,10)}.csv`, rows)
+    },
+    exportShoppingListPDF() {
+      if (this.uniqueIngredients.length === 0) {
+        alert('Nothing to export. Please generate a plan first.')
+        return
+      }
+      const doc = new jsPDF()
+      doc.setFontSize(16)
+      doc.text('Shopping List', 14, 18)
+      autoTable(doc, {
+        head: [["Ingredient"]],
+        body: this.uniqueIngredients.map(i => [i]),
+        startY: 24
+      })
+      doc.save(`shopping-list-${new Date().toISOString().slice(0,10)}.pdf`)
+    },
+    exportWeekPlanPDF() {
+      if (this.mealPlan.length === 0) {
+        alert('Nothing to export. Please generate a plan first.')
+        return
+      }
+      const doc = new jsPDF('p', 'mm', 'a4')
+      doc.setFontSize(16)
+      doc.text('Weekly Meal Plan', 14, 18)
+      const rows = this.buildWeekPlanData().map(r => [
+        r.Day, r.Title, r.Category, r.Servings, r.Calories, r.CookingTime
+      ])
+      autoTable(doc, {
+        head: [["Day", "Title", "Category", "Servings", "Calories", "Cook Time"]],
+        body: rows,
+        startY: 24,
+        styles: { fontSize: 10 }
+      })
+      doc.save(`weekly-meal-plan-${new Date().toISOString().slice(0,10)}.pdf`)
+    },
+    exportPlan() {
+      // Default to exporting the weekly meal plan PDF
+      this.exportWeekPlanPDF()
+    },
     loadSavedPlan() {
       const saved = localStorage.getItem('savedMealPlan')
       if (saved) {
@@ -347,7 +478,6 @@ export default {
       }
     }
   },
-  
   mounted() {
     this.loadSavedPlan()
   }
@@ -398,16 +528,16 @@ export default {
 }
 
 .bg-success {
-  background: #28a745 !important;
+  background: var(--color-green-500) !important;
 }
 
 .btn-success {
-  background: #28a745;
+  background: var(--color-green-500);
   border: none;
 }
 
 .btn-success:hover {
-  background: #218838;
+  background: var(--color-green-400);
 }
 
 @media (max-width: 768px) {
@@ -422,5 +552,20 @@ export default {
   .summary-stat {
     margin-bottom: 1rem;
   }
+}
+
+.page-title {
+  color: var(--color-green-400) !important;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+}
+.page-title .fa-calendar-alt {
+  color: var(--color-green-400);
+}
+
+.lead {
+  color: rgba(0, 0, 0, 0.70);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
 }
 </style>

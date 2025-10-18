@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #9BC7AF;">
+  <nav class="navbar navbar-expand-lg navbar-dark" :style="{ backgroundColor: '#064e3b' }">
     <div class="container">
       <router-link class="navbar-brand" to="/">
         <i class="fas fa-utensils me-2"></i>
@@ -27,19 +27,19 @@
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/recipes" active-class="active">
-              <i class="fas fa-book me-1" style="color: #007bff;"></i>Recipes
+              <i class="fas fa-book me-1"></i>Recipes
             </router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/meal-plan" active-class="active">
-              <i class="fas fa-calendar-week me-1" style="color: #28a745;"></i>Meal Plan
+              <i class="fas fa-calendar-week me-1"></i>Meal Plan
             </router-link>
           </li>
           
           <!-- Authentication Section -->
           <li v-if="!isLoggedIn" class="nav-item">
             <router-link class="nav-link" to="/auth" active-class="active">
-              <i class="fas fa-sign-in-alt me-1" style="color: #6f42c1;"></i>Login
+              <i class="fas fa-sign-in-alt me-1"></i>Login
             </router-link>
           </li>
           
@@ -158,16 +158,43 @@ export default {
 
 <style scoped>
 .navbar-brand {
-  font-weight: bold;
+  font-weight: 800;
   font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+.navbar-dark .navbar-nav .nav-link i {
+  color: inherit;
 }
 
 .nav-link.active {
-  font-weight: bold;
+  font-weight: 700;
+  color: #ffffff !important;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:focus {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.35);
 }
 
 .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .dropdown-menu {
@@ -182,15 +209,15 @@ export default {
 }
 
 .dropdown-item:hover {
-  background-color: #f8f9fa;
+  background-color: rgba(34, 197, 94, 0.08);
 }
 
 .badge {
   font-size: 0.7rem;
 }
 
-/* Color coding for modules */
-.recipes-module { color:  #9BC7AF!important; }
-.meal-plan-module { color: #C7EED0 !important; }
-.auth-module { color: #9BC7AF !important; }
+/* Remove old module color overrides to use new global palette */
+.recipes-module { color:  var(--color-green-500) !important; }
+.meal-plan-module { color: var(--color-green-400) !important; }
+.auth-module { color: var(--color-green-500) !important; }
 </style>

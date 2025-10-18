@@ -1,5 +1,4 @@
-// Recipe rating data storage utility
-// Manage recipe rating data using localStorage
+// Rating storage for recipes
 
 /**
  * Get all rating data
@@ -23,9 +22,9 @@ export function getAllRatings() {
 export function getRecipeRatings(recipeId) {
   const allRatings = getAllRatings()
   return allRatings[recipeId] || {
-    ratings: [], // User rating list
+    ratings: [], // User ratings
     averageRating: 0, // Average rating
-    totalRatings: 0 // Total rating count
+    totalRatings: 0 // Total ratings
   }
 }
 
@@ -125,7 +124,7 @@ export function removeRating(recipeId, userId, isAdmin = false) {
     
     const ratingIndex = recipeRatings.ratings.findIndex(r => r.userId === userId)
     if (ratingIndex === -1) {
-      return false // Rating not found
+      return false // No rating found
     }
     
     // Remove rating

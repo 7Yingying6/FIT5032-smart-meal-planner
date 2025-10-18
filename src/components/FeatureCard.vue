@@ -34,12 +34,16 @@ export default {
 
 <style scoped>
 .feature-card {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-lg);
+  transition: transform var(--transition-normal) var(--ease), box-shadow var(--transition-normal) var(--ease);
 }
 
 .feature-card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover-lg);
 }
 
 .feature-icon-wrapper {

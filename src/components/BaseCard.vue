@@ -12,7 +12,7 @@
       customClass
     ]"
   >
-    <!-- Card Header -->
+    <!-- Card header -->
     <div 
       v-if="$slots.header || title"
       :class="[
@@ -29,7 +29,7 @@
       </slot>
     </div>
 
-    <!-- Card Body -->
+    <!-- Card body -->
     <div 
       :class="[
         'card-body',
@@ -40,7 +40,7 @@
       <slot></slot>
     </div>
 
-    <!-- Card Footer -->
+    <!-- Card footer -->
     <div 
       v-if="$slots.footer"
       :class="[
@@ -104,10 +104,14 @@ export default {
 
 <style scoped>
 .card {
-  transition: all 0.3s ease;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  transition: transform var(--transition-normal) var(--ease), box-shadow var(--transition-normal) var(--ease);
 }
 
 .card:hover {
   transform: translateY(-2px);
+  box-shadow: var(--shadow-hover-lg);
 }
 </style>

@@ -1,24 +1,23 @@
 # Smart Meal Planner
 
-A Vue.js-based smart meal planning application that helps users browse recipes, create weekly plans, and generate shopping lists.
+A small Vue 3 app I put together for planning weeknight meals, browsing recipes, and turning the plan into a clean shopping list. Built with Vite, designed to be fast and easy to use on both desktop and mobile.
 
-## Features
+## What it does
 
-- Responsive Design (Bootstrap 5)
-- Recipe Browsing & Filtering
-- Weekly Meal Planning
-- Auto Shopping Lists
-- User Authentication & Roles
-- Smart Search & Filter
+- Browse recipes and filter by category, time, and difficulty
+- Plan the week and see a quick summary of your meals
+- Auto-generate a shopping list from the plan (with search, sort, and pagination)
+- Rate recipes and keep simple stats
+- Sign in/out with basic roles (for coursework)
 
-## Tech Stack
+## Tech
 
-- Vue.js 3 + Vite
+- Vue 3 + Vite
 - Vue Router 4
-- Bootstrap 5
-- Font Awesome
+- Bootstrap 5 + Font Awesome
+- Firebase Auth (optional/demo)
 
-## Quick Start
+## Getting started
 
 ```bash
 # Install dependencies
@@ -27,30 +26,18 @@ npm install
 # Start dev server
 npm run dev
 
-# Visit http://localhost:5173
+# Visit
+http://localhost:5173
 ```
 
-## Project Structure
+## Pages
 
-- **Home**: Overview page
-- **Recipes**: Recipe browsing & filtering
-- **Recipe Detail**: Detailed recipe view
-- **Meal Plan**: Weekly meal planning
-- **Auth**: User authentication
+- Home: overview and shortcuts
+- Recipes: browse and filter
+- Recipe Detail: stats, ratings, and content
+- Meal Plan: weekly plan + shopping list
+- Auth: sign in/register (demo accounts)
 
-## Build Commands
+## Notes
 
-```bash
-# Development
-npm run dev
-
-# Production build
-npm run build
-
-# Preview build
-npm run preview
-```
-
-## License
-
-This project is for FIT5032 coursework, educational purposes only.
+This repo was organized for FIT5032 coursework. It is intentionally simple and not production-hardened. If you spot anything that could be cleaner, feel free to improve it.

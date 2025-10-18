@@ -254,6 +254,7 @@ export default {
         }
       } catch (error) {
         console.error('Error submitting rating:', error)
+        console.trace('submitRating trace')
         this.errorMessage = 'An unexpected error occurred. Please try again.'
       } finally {
         this.isSubmitting = false

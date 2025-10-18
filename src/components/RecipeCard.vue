@@ -124,6 +124,6 @@ export default {
 }
 
 .btn-primary:hover {
-  /* Simplified button hover effect */
+  /* Simple hover effect for buttons */
 }
 </style>

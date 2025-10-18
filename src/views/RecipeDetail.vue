@@ -1,7 +1,7 @@
 <template>
   <div class="recipe-detail-page">
     <div v-if="recipe" class="container py-4">
-      <!-- Breadcrumb Navigation -->
+      <!-- Breadcrumbs -->
       <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
@@ -494,13 +494,28 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Ingredients section split layout */
 .ingredients-list {
   max-height: 400px;
   overflow-y: auto;
 }
 
 .ingredient-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   border: 1px solid transparent;
+}
+
+.ingredient-item .qty-badge {
+  min-width: 64px;
+  padding: 0.35rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-primary);
+  background: linear-gradient(180deg, var(--color-bg-start), #d9fbe8);
+  box-shadow: var(--shadow-sm);
 }
 
 .ingredient-item:hover {
@@ -513,18 +528,21 @@ export default {
   color: #6c757d;
 }
 
+/* Instructions list: custom numbered bubble */
 .instructions-list {
-  counter-reset: none;
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .instruction-item {
-  border-left: 4px solid #28a745;
+  border-left: 4px solid var(--color-green-500);
+  transition: transform var(--transition-fast) var(--ease);
 }
 
 .instruction-item:hover {
   background-color: #f8f9fa !important;
+  transform: scale(1.01);
 }
 
 .step-number {
@@ -534,33 +552,27 @@ export default {
   align-items: center;
   justify-content: center;
   font-weight: bold;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #91dc95 0%, #1e5a2c 100%);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
-.alternative-item {
-  background-color: #fff;
-}
-
-.alternative-item:hover {
-  background-color: #fff3cd;
-  border-color: #ffc107 !important;
-}
-
+/* Tag/Chip styling */
 .recipe-tags .badge {
-  font-size: 0.8rem;
-  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  background: #f4f8f7;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
 }
 
-@media (max-width: 768px) {
-  .recipe-main-image {
-    height: 250px;
+@media (max-width: 600px) {
+  .ingredient-item {
+    flex-wrap: wrap;
   }
-  
-  .display-5 {
-    font-size: 2rem;
-  }
-  
-  .stat-card {
-    margin-bottom: 1rem;
+  .ingredient-item .qty-badge {
+    min-width: 48px;
+    margin-bottom: 0.25rem;
   }
 }
 </style>

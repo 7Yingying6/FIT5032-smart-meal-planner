@@ -16,6 +16,7 @@
             
             <div class="card-body p-4">
               <!-- Auth Mode Toggle -->
+              <!-- Toggle between sign-in and register -->
               <div class="text-center mb-4">
                 <div class="btn-group" role="group">
                   <button 
@@ -33,9 +34,9 @@
                 </div>
               </div>
 
-              <!-- Auth Form -->
+              <!-- Auth form -->
               <form @submit.prevent="handleSubmit" novalidate>
-                <!-- Full Name (Register only) -->
+                <!-- Full name (register only) -->
                 <div v-if="!isLogin" class="mb-3">
                   <label for="fullName" class="form-label">
                     <i class="fas fa-user me-2"></i>Full Name *
@@ -54,7 +55,7 @@
                   </div>
                 </div>
 
-                <!-- Email -->
+                <!-- Email address -->
                 <div class="mb-3">
                   <label for="email" class="form-label">
                     <i class="fas fa-envelope me-2"></i>Email Address *
@@ -73,7 +74,7 @@
                   </div>
                 </div>
 
-                <!-- Password -->
+                <!-- Password field -->
                 <div class="mb-3">
                   <label for="password" class="form-label">
                     <i class="fas fa-lock me-2"></i>Password *
@@ -107,7 +108,7 @@
                   </div>
                 </div>
 
-                <!-- Confirm Password (Register only) -->
+                <!-- Confirm password (register only) -->
                 <div v-if="!isLogin" class="mb-3">
                   <label for="confirmPassword" class="form-label">
                     <i class="fas fa-lock me-2"></i>Confirm Password *
@@ -126,7 +127,7 @@
                   </div>
                 </div>
 
-                <!-- User Role Selection -->
+                <!-- Choose a role -->
                 <div class="mb-4">
                   <label for="userRole" class="form-label">
                     <i class="fas fa-user-tag me-2"></i>User Role
@@ -152,7 +153,7 @@
                   </div>
                 </div>
 
-                <!-- Terms and Conditions (Register only) -->
+                <!-- Terms & privacy (register only) -->
                 <div v-if="!isLogin" class="mb-4">
                   <div class="form-check">
                     <input 
@@ -175,7 +176,7 @@
                   </div>
                 </div>
 
-                <!-- Remember Me (Login only) -->
+                <!-- Remember me (login only) -->
                 <div v-if="isLogin" class="mb-4">
                   <div class="form-check">
                     <input 
@@ -190,7 +191,7 @@
                   </div>
                 </div>
 
-                <!-- Submit Button -->
+                <!-- Submit button -->
                 <div class="d-grid mb-3">
                   <button 
                     type="submit" 
@@ -203,7 +204,7 @@
                   </button>
                 </div>
 
-                <!-- Additional Links -->
+                <!-- Password reset and switch -->
                 <div class="text-center">
                   <div v-if="isLogin" class="mb-2">
                     <a href="#" class="text-muted text-decoration-none small">
@@ -225,7 +226,7 @@
             </div>
           </div>
 
-          <!-- Demo Users & Quick Login -->
+          <!-- Demo users & quick login -->
           <div class="card mt-4 border-info">
             <div class="card-header bg-info text-white">
               <h6 class="mb-0">
@@ -239,7 +240,7 @@
               </p>
               
               <div class="row g-3 justify-content-center">
-                 <!-- Student Demo User -->
+                 <!-- Student demo user -->
                  <div class="col-md-5">
                    <div class="demo-user-card p-3 border rounded">
                      <div class="d-flex align-items-center mb-2">
@@ -263,7 +264,7 @@
                    </div>
                  </div>
                  
-                 <!-- Nutritionist Demo User -->
+                 <!-- Nutritionist demo user -->
                  <div class="col-md-5">
                    <div class="demo-user-card p-3 border rounded">
                      <div class="d-flex align-items-center mb-2">
@@ -299,6 +300,10 @@
 import userStorage from '@/utils/userStorage.js'
 import passwordHash from '@/utils/passwordHash.js'
 
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import app from '@/firebase.js';
+const auth = getAuth(app);
+
 export default {
   name: 'Auth',
   data() {
@@ -316,7 +321,7 @@ export default {
         rememberMe: false
       },
       errors: {},
-      // Demo users data
+      // Demo users
       demoUsers: {
         student: {
           firstName: 'Robby',
@@ -506,67 +511,46 @@ export default {
     },
     
     async handleSubmit() {
-      if (!this.validateForm()) {
-        return
-      }
-      
-      this.isSubmitting = true
-      
+      if (!this.validateForm()) return;
+  
+      this.isSubmitting = true;
+  
       try {
-        let result
-        
+        let firebaseResult;
+        let userCredential;
+  
         if (this.isLogin) {
-          // Handle login
-          result = await userStorage.loginUser(this.form.email, this.form.password)
+          userCredential = await signInWithEmailAndPassword(auth, this.form.email, this.form.password);
+          firebaseResult = { success: true, message: 'Login successful' };
         } else {
-          // Handle registration
-          const [firstName, ...lastNameParts] = this.form.fullName.trim().split(' ')
-          const lastName = lastNameParts.join(' ') || ''
-          
+          userCredential = await createUserWithEmailAndPassword(auth, this.form.email, this.form.password);
+          firebaseResult = { success: true, message: 'Registration successful' };
+        }
+  
+        if (firebaseResult.success) {
+          const uid = userCredential?.user?.uid || auth.currentUser?.uid || Date.now().toString();
+          const [firstName, ...lastNameParts] = (this.form.fullName || '').trim().split(' ');
           const userData = {
+            id: uid,
             email: this.form.email,
-            password: this.form.password,
-            firstName: firstName,
-            lastName: lastName,
-            role: this.form.userRole
-          }
-          
-          result = await userStorage.registerUser(userData)
-        }
-        
-        if (result.success) {
-          // Save user session
-          userStorage.saveCurrentUser(result.user)
-          
-          // Show success message
-          this.showSuccessMessage(result.message, result.user)
-          
-          // Small delay to ensure localStorage is written before navigation
+            firstName: firstName || 'User',
+            lastName: lastNameParts.join(' '),
+            role: this.form.userRole || 'user'
+          };
+  
+          userStorage.saveCurrentUser(userData, this.form.rememberMe);
+  
+          this.showSuccessMessage(firebaseResult.message, userData);
           setTimeout(() => {
-            this.$router.push('/')
-          }, 100)
-        } else {
-          // Show error message
-          this.showErrorMessage(result.message)
+            this.$router.push('/');
+          }, 1000);
         }
-        
-      } catch (error) {
-        console.error('Authentication error:', error)
-        this.showErrorMessage('An unexpected error occurred. Please try again.')
+  
+      } catch (err) {
+        console.error('Firebase Auth Error:', err);
+        this.showErrorMessage(err.message || 'Firebase authentication failed');
       } finally {
-        this.isSubmitting = false
-      }
-    },
-    
-    clearForm() {
-      this.form = {
-        fullName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        userRole: '',
-        agreeTerms: false,
-        rememberMe: false
+        this.isSubmitting = false;
       }
     },
     
@@ -587,82 +571,57 @@ export default {
       return passwordHash.checkPasswordStrength(password)
     },
     
-    // Quick login method for demo users
+    // Quick login for demo users
     async quickLogin(userType) {
       try {
-        this.isSubmitting = true
-        this.clearErrors()
-        
-        const demoUser = this.demoUsers[userType]
+        this.isSubmitting = true;
+        this.clearErrors();
+  
+        const demoUser = this.demoUsers[userType];
         if (!demoUser) {
-          this.showErrorMessage('Demo user not found')
-          return
+          this.showErrorMessage('Demo user not found');
+          return;
         }
-        
-        // Set form to login mode
-        this.isLogin = true
-        
-        // Fill form with demo user credentials
-        this.form.email = demoUser.email
-        this.form.password = demoUser.password
-        
-        // Attempt login
-        const result = await userStorage.loginUser(demoUser.email, demoUser.password)
-        
-        if (result.success) {
-          this.showSuccessMessage('Login successful!', result.user)
-          
-          // Redirect to home page
-          setTimeout(() => {
-            this.$router.push('/')
-          }, 1500)
-        } else {
-          this.showErrorMessage(result.message || 'Login failed')
-        }
+  
+        const credential = await signInWithEmailAndPassword(auth, demoUser.email, demoUser.password);
+        const uid = credential?.user?.uid || auth.currentUser?.uid || Date.now().toString();
+        const userData = {
+          id: uid,
+          email: demoUser.email,
+          firstName: demoUser.firstName,
+          lastName: demoUser.lastName,
+          role: demoUser.role
+        };
+  
+        userStorage.saveCurrentUser(userData, true);
+  
+        this.showSuccessMessage('Quick login successful!', userData);
+  
+        setTimeout(() => {
+          this.$router.push('/');
+        }, 1200);
+  
       } catch (error) {
-        console.error('Quick login error:', error)
-        this.showErrorMessage('An error occurred during login')
+        console.error('Quick login error:', error);
+        this.showErrorMessage('Quick login failed. Please check Firebase credentials.');
       } finally {
-        this.isSubmitting = false
+        this.isSubmitting = false;
       }
     },
     
     // Pre-register demo users
     async preRegisterDemoUsers() {
-      try {
-        for (const [userType, userData] of Object.entries(this.demoUsers)) {
-          // Check if user already exists
-          const existingUsers = userStorage.getAllUsers()
-          const userExists = existingUsers.some(user => user.email === userData.email)
-          
-          if (!userExists) {
-            // Register the demo user
-            await userStorage.registerUser(
-              userData.firstName,
-              userData.lastName,
-              userData.email,
-              userData.password,
-              userData.role
-            )
-            console.log(`Demo user registered: ${userData.email}`)
-          }
-        }
-      } catch (error) {
-        console.error('Error pre-registering demo users:', error)
-      }
+      // Skip local pre-register; use Firebase Auth demo accounts
+      console.log('Skipping local pre-register; using Firebase Auth demo accounts');
     }
   },
   
-  // Pre-register demo users when component mounts
-  async mounted() {
-    await this.preRegisterDemoUsers()
-  }
+  // No mounted hook; we rely on Firebase demo accounts
 }
 </script>
 
 <style scoped>
 .auth-page {
-  min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
@@ -674,21 +633,17 @@ export default {
 }
 
 .card-header {
-  background: #007bff !important;
+  background: var(--bs-primary) !important;
   border: none;
 }
 
 .btn-primary {
-  background: #007bff;
+  background: var(--bs-primary);
   border: none;
 }
 
 .btn-primary:hover {
-  background: #0056b3;
-}
-
-.btn-outline-primary:hover {
-  /* Simplified hover effect */
+  background: #035480; /* darker primary */
 }
 
 .form-control {
@@ -697,16 +652,16 @@ export default {
 }
 
 .form-control:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
 }
 
 .form-control.is-valid {
-  border-color: #28a745;
+  border-color: var(--bs-success);
 }
 
 .form-control.is-invalid {
-  border-color: #dc3545;
+  border-color: var(--bs-danger);
 }
 
 .form-select {
@@ -715,8 +670,8 @@ export default {
 }
 
 .form-select:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
 }
 
 .password-strength {
@@ -732,7 +687,7 @@ export default {
   height: 1rem;
 }
 
-/* Demo user cards styling */
+/* Demo user cards */
 .demo-user-card {
   background-color: #f8f9fa;
   transition: all 0.3s ease;
