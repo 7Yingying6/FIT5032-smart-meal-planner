@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.0.0",
+    "@iconify/vue": "^5.0.0",
     "bootstrap": "^5.3.8",
     "datatables.net": "^2.3.4",
     "datatables.net-dt": "^2.3.4",

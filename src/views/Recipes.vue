@@ -6,7 +6,7 @@
         <div class="row align-items-center">
           <div class="col-md-8">
             <h1 class="display-4 mb-2 page-title">
-              <i class="fas fa-utensils me-3"></i>Recipe Collection
+              <Icon icon="mdi:silverware-fork-knife" class="me-3" />Recipe Collection
             </h1>
             <p class="lead mb-0">Discover delicious recipes for every occasion</p>
           </div>
@@ -26,7 +26,7 @@
           <div class="card shadow-sm">
             <div class="card-body">
               <h5 class="card-title mb-3">
-                <i class="fas fa-filter me-2"></i>Filter Recipes
+                <Icon icon="mdi:filter-variant" class="me-2" />Filter Recipes
               </h5>
               <div class="row g-3">
                 <div class="col-md-3">
@@ -91,7 +91,7 @@
                     class="btn btn-outline-secondary"
                     :disabled="!hasActiveFilters"
                   >
-                    <i class="fas fa-times me-2"></i>Clear Filters
+                    <Icon icon="mdi:close" class="me-2" />Clear Filters
                   </button>
                 </div>
               </div>
@@ -116,11 +116,11 @@
         <div class="col-12 text-center py-5">
           <div class="card">
             <div class="card-body">
-              <i class="fas fa-search fa-3x text-muted mb-3"></i>
+              <Icon icon="mdi:magnify" class="text-muted mb-3" style="font-size: 3rem" />
               <h4 class="text-muted">No recipes found</h4>
               <p class="text-muted">Try adjusting your filters to see more results.</p>
               <button @click="clearFilters" class="btn btn-primary">
-                <i class="fas fa-times me-2"></i>Clear All Filters
+                <Icon icon="mdi:close" class="me-2" />Clear All Filters
               </button>
             </div>
           </div>
@@ -222,7 +222,7 @@ export default {
   letter-spacing: 0.2px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
 }
-.page-title .fa-utensils {
+.page-title .iconify {
   color: var(--color-green-400);
 }
 

@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark" :style="{ backgroundColor: '#064e3b' }">
     <div class="container">
       <router-link class="navbar-brand" to="/">
-        <i class="fas fa-utensils me-2"></i>
+        <Icon icon="mdi:silverware-fork-knife" class="me-2" />
         Smart Meal Planner
       </router-link>
       
@@ -22,24 +22,24 @@
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
             <router-link class="nav-link" to="/" active-class="active">
-              <i class="fas fa-home me-1"></i>Home
+              <Icon icon="mdi:home" class="me-1" />Home
             </router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/recipes" active-class="active">
-              <i class="fas fa-book me-1"></i>Recipes
+              <Icon icon="mdi:book-open-page-variant" class="me-1" />Recipes
             </router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/meal-plan" active-class="active">
-              <i class="fas fa-calendar-week me-1"></i>Meal Plan
+              <Icon icon="mdi:calendar-week" class="me-1" />Meal Plan
             </router-link>
           </li>
           
           <!-- Authentication Section -->
           <li v-if="!isLoggedIn" class="nav-item">
             <router-link class="nav-link" to="/auth" active-class="active">
-              <i class="fas fa-sign-in-alt me-1"></i>Login
+              <Icon icon="mdi:login" class="me-1" />Login
             </router-link>
           </li>
           
@@ -53,35 +53,35 @@
               data-bs-toggle="dropdown" 
               aria-expanded="false"
             >
-              <i class="fas fa-user-circle me-1" style="color: #6f42c1;"></i>
+              <Icon icon="mdi:account-circle" class="me-1" style="color: #6f42c1;" />
               {{ currentUser.firstName }}
               <span class="badge bg-secondary ms-1">{{ currentUser.role }}</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
               <li>
                 <h6 class="dropdown-header">
-                  <i class="fas fa-user me-2"></i>{{ currentUser.firstName }} {{ currentUser.lastName }}
+                  <Icon icon="mdi:account" class="me-2" />{{ currentUser.firstName }} {{ currentUser.lastName }}
                 </h6>
               </li>
               <li><hr class="dropdown-divider"></li>
               <li>
                 <span class="dropdown-item-text">
                   <small class="text-muted">
-                    <i class="fas fa-envelope me-1"></i>{{ currentUser.email }}
+                    <Icon icon="mdi:email" class="me-1" />{{ currentUser.email }}
                   </small>
                 </span>
               </li>
               <li>
                 <span class="dropdown-item-text">
                   <small class="text-muted">
-                    <i class="fas fa-id-badge me-1"></i>Role: {{ currentUser.role }}
+                    <Icon icon="mdi:card-account-details-outline" class="me-1" />Role: {{ currentUser.role }}
                   </small>
                 </span>
               </li>
               <li><hr class="dropdown-divider"></li>
               <li>
                 <button class="dropdown-item" @click="handleLogout">
-                  <i class="fas fa-sign-out-alt me-2 text-danger"></i>Logout
+                  <Icon icon="mdi:logout" class="me-2 text-danger" />Logout
                 </button>
               </li>
             </ul>

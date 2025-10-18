@@ -4,12 +4,12 @@
       <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
           <div class="card shadow-lg border-0">
-            <div class="card-header bg-primary text-white text-center py-4">
+            <div class="card-header bg-white text-dark text-center py-4">
               <h2 class="mb-0">
-                <i class="fas fa-user-circle me-3"></i>
+                <Icon icon="mdi:account-circle" class="me-3 text-primary" />
                 {{ isLogin ? 'Welcome Back' : 'Join Us Today' }}
               </h2>
-              <p class="mb-0 mt-2 opacity-75">
+              <p class="mb-0 mt-2 text-muted">
                 {{ isLogin ? 'Sign in to your account' : 'Create your account to get started' }}
               </p>
             </div>
@@ -23,13 +23,13 @@
                     @click="isLogin = true" 
                     :class="['btn', isLogin ? 'btn-primary' : 'btn-outline-primary']"
                   >
-                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                    <Icon icon="mdi:login" class="me-2" />Login
                   </button>
                   <button 
                     @click="isLogin = false" 
                     :class="['btn', !isLogin ? 'btn-primary' : 'btn-outline-primary']"
                   >
-                    <i class="fas fa-user-plus me-2"></i>Register
+                    <Icon icon="mdi:account-plus" class="me-2" />Register
                   </button>
                 </div>
               </div>
@@ -39,7 +39,7 @@
                 <!-- Full name (register only) -->
                 <div v-if="!isLogin" class="mb-3">
                   <label for="fullName" class="form-label">
-                    <i class="fas fa-user me-2"></i>Full Name *
+                    <Icon icon="mdi:account" class="me-2" />Full Name *
                   </label>
                   <input 
                     id="fullName"
@@ -58,7 +58,7 @@
                 <!-- Email address -->
                 <div class="mb-3">
                   <label for="email" class="form-label">
-                    <i class="fas fa-envelope me-2"></i>Email Address *
+                    <Icon icon="mdi:email" class="me-2" />Email Address *
                   </label>
                   <input 
                     id="email"
@@ -77,7 +77,7 @@
                 <!-- Password field -->
                 <div class="mb-3">
                   <label for="password" class="form-label">
-                    <i class="fas fa-lock me-2"></i>Password *
+                    <Icon icon="mdi:lock" class="me-2" />Password *
                   </label>
                   <div class="input-group">
                     <input 
@@ -94,7 +94,7 @@
                       class="btn btn-outline-secondary"
                       @click="showPassword = !showPassword"
                     >
-                      <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                      <Icon :icon="showPassword ? 'mdi:eye-off-outline' : 'mdi:eye-outline'" />
                     </button>
                   </div>
                   <div v-if="errors.password" class="invalid-feedback d-block">
@@ -111,7 +111,7 @@
                 <!-- Confirm password (register only) -->
                 <div v-if="!isLogin" class="mb-3">
                   <label for="confirmPassword" class="form-label">
-                    <i class="fas fa-lock me-2"></i>Confirm Password *
+                    <Icon icon="mdi:lock" class="me-2" />Confirm Password *
                   </label>
                   <input 
                     id="confirmPassword"
@@ -130,7 +130,7 @@
                 <!-- Choose a role -->
                 <div class="mb-4">
                   <label for="userRole" class="form-label">
-                    <i class="fas fa-user-tag me-2"></i>User Role
+                    <Icon icon="mdi:account-badge-outline" class="me-2" />User Role
                   </label>
                   <select 
                     id="userRole"
@@ -147,7 +147,7 @@
                   </div>
                   <div class="form-text">
                     <small class="text-muted">
-                      <i class="fas fa-info-circle me-1"></i>
+                      <Icon icon="mdi:information-outline" class="me-1" />
                       Regular users can browse and save recipes. Administrators have additional management features.
                     </small>
                   </div>
@@ -199,7 +199,7 @@
                     :disabled="isSubmitting"
                   >
                     <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
-                    <i v-else :class="isLogin ? 'fas fa-sign-in-alt' : 'fas fa-user-plus'" class="me-2"></i>
+                    <i v-else :class="isLogin ? 'mdi:login' : 'mdi:account-plus'" class="me-2"></i>
                     {{ isSubmitting ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account') }}
                   </button>
                 </div>
@@ -208,7 +208,7 @@
                 <div class="text-center">
                   <div v-if="isLogin" class="mb-2">
                     <a href="#" class="text-muted text-decoration-none small">
-                      <i class="fas fa-key me-1"></i>Forgot your password?
+                      <Icon icon="mdi:key-outline" class="me-1" />Forgot your password?
                     </a>
                   </div>
                   <div class="text-muted small">
@@ -230,12 +230,12 @@
           <div class="card mt-4 border-info">
             <div class="card-header bg-info text-white">
               <h6 class="mb-0">
-                <i class="fas fa-users me-2"></i>Demo Users - Quick Login
+                <Icon icon="mdi:account-group" class="me-2" />Demo Users - Quick Login
               </h6>
             </div>
             <div class="card-body">
               <p class="text-muted small mb-3">
-                <i class="fas fa-lightbulb me-1"></i>
+                <Icon icon="mdi:lightbulb-on-outline" class="me-1" />
                 Try different user roles to see how the system adapts to different permissions and features.
               </p>
               
@@ -244,7 +244,7 @@
                  <div class="col-md-5">
                    <div class="demo-user-card p-3 border rounded">
                      <div class="d-flex align-items-center mb-2">
-                <i class="fas fa-graduation-cap text-primary me-2"></i>
+                <Icon icon="mdi:school" class="text-primary me-2" />
                 <strong>User</strong>
               </div>
               <div class="demo-credentials mb-2">
@@ -259,7 +259,7 @@
                        class="btn btn-outline-primary btn-sm w-100"
                        :disabled="isSubmitting"
                      >
-                       <i class="fas fa-sign-in-alt me-1"></i>Quick Login
+                       <Icon icon="mdi:login" class="me-1" />Quick Login
                      </button>
                    </div>
                  </div>
@@ -268,7 +268,7 @@
                  <div class="col-md-5">
                    <div class="demo-user-card p-3 border rounded">
                      <div class="d-flex align-items-center mb-2">
-                       <i class="fas fa-user-md text-success me-2"></i>
+                       <Icon icon="mdi:stethoscope" class="text-success me-2" />
                        <strong>Nutritionist</strong>
                      </div>
                      <div class="demo-credentials mb-2">
@@ -283,7 +283,7 @@
                        class="btn btn-outline-success btn-sm w-100"
                        :disabled="isSubmitting"
                      >
-                       <i class="fas fa-sign-in-alt me-1"></i>Quick Login
+                       <Icon icon="mdi:login" class="me-1" />Quick Login
                      </button>
                    </div>
                  </div>
@@ -622,7 +622,7 @@ export default {
 
 <style scoped>
 .auth-page {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f7f7f8; /* simpler neutral background */
   display: flex;
   align-items: center;
 }
@@ -633,8 +633,9 @@ export default {
 }
 
 .card-header {
-  background: var(--bs-primary) !important;
-  border: none;
+  background: #ffffff !important; /* plain header */
+  color: #0f172a; /* dark text for contrast */
+  border-bottom: 1px solid #e9ecef; /* subtle divider */
 }
 
 .btn-primary {
@@ -643,7 +644,7 @@ export default {
 }
 
 .btn-primary:hover {
-  background: #035480; /* darker primary */
+  background: #0b5ed7; /* slightly toned-down hover */
 }
 
 .form-control {

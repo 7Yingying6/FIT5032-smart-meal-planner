@@ -12,7 +12,7 @@
       </div>
       <div class="position-absolute bottom-0 start-0 m-2">
         <span class="badge bg-dark">
-          <i class="fas fa-clock me-1"></i>{{ recipe.cookingTime }}min
+          <Icon icon="mdi:clock-outline" class="me-1" />{{ recipe.cookingTime }}min
         </span>
       </div>
     </div>
@@ -35,19 +35,19 @@
         <div class="row text-center">
           <div class="col-4">
             <small class="text-muted">
-              <i class="fas fa-users"></i><br>
+              <Icon icon="mdi:account-group" /><br>
               {{ recipe.servings }} servings
             </small>
           </div>
           <div class="col-4">
             <small class="text-muted">
-              <i class="fas fa-fire"></i><br>
+              <Icon icon="mdi:fire" /><br>
               {{ recipe.calories }} cal
             </small>
           </div>
           <div class="col-4">
             <small class="text-muted">
-              <i class="fas fa-chart-line"></i><br>
+              <Icon icon="mdi:chart-line" /><br>
               {{ recipe.difficulty }}
             </small>
           </div>
@@ -75,7 +75,7 @@
           :to="`/recipe/${recipe.id}`" 
           class="btn btn-primary w-100"
         >
-          <i class="fas fa-eye me-2"></i>View Recipe
+          <Icon icon="mdi:eye" class="me-2" />View Recipe
         </router-link>
       </div>
     </div>

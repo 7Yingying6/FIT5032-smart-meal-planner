@@ -6,12 +6,12 @@
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
             <router-link to="/" class="text-decoration-none">
-              <i class="fas fa-home me-1"></i>Home
+              <Icon icon="mdi:home" class="me-1" />Home
             </router-link>
           </li>
           <li class="breadcrumb-item">
             <router-link to="/recipes" class="text-decoration-none">
-              <i class="fas fa-utensils me-1"></i>Recipes
+              <Icon icon="mdi:silverware-fork-knife" class="me-1" />Recipes
             </router-link>
           </li>
           <li class="breadcrumb-item active" aria-current="page">{{ recipe.title }}</li>
@@ -41,28 +41,28 @@
             <div class="row g-3 mb-4">
               <div class="col-6 col-md-3">
                 <div class="stat-card text-center p-3 bg-light rounded">
-                  <i class="fas fa-clock text-primary fs-4 mb-2"></i>
+                  <Icon icon="mdi:clock-outline" class="text-primary fs-4 mb-2" />
                   <div class="fw-bold">{{ recipe.cookingTime }} min</div>
                   <small class="text-muted">Cook Time</small>
                 </div>
               </div>
               <div class="col-6 col-md-3">
                 <div class="stat-card text-center p-3 bg-light rounded">
-                  <i class="fas fa-users text-success fs-4 mb-2"></i>
+                  <Icon icon="mdi:account-group" class="text-info fs-4 mb-2" />
                   <div class="fw-bold">{{ recipe.servings }}</div>
                   <small class="text-muted">Servings</small>
                 </div>
               </div>
               <div class="col-6 col-md-3">
                 <div class="stat-card text-center p-3 bg-light rounded">
-                  <i class="fas fa-fire text-danger fs-4 mb-2"></i>
+                  <Icon icon="mdi:fire" class="text-danger fs-4 mb-2" />
                   <div class="fw-bold">{{ recipe.calories }}</div>
                   <small class="text-muted">Calories</small>
                 </div>
               </div>
               <div class="col-6 col-md-3">
                 <div class="stat-card text-center p-3 bg-light rounded">
-                  <i class="fas fa-chart-line text-warning fs-4 mb-2"></i>
+                  <Icon icon="mdi:chart-line" class="text-warning fs-4 mb-2" />
                   <div class="fw-bold">{{ recipe.difficulty }}</div>
                   <small class="text-muted">Difficulty</small>
                 </div>
@@ -75,7 +75,7 @@
                 <!-- Average Rating -->
                 <div class="col-md-4">
                   <div class="rating-card text-center p-3 bg-light rounded">
-                    <i class="fas fa-star text-warning fs-4 mb-2"></i>
+                    <Icon icon="mdi:star" class="text-warning fs-4 mb-2" />
                     <div class="fw-bold fs-5">{{ currentRating.averageRating.toFixed(1) }}</div>
                     <small class="text-muted">Average Rating</small>
                   </div>
@@ -84,7 +84,7 @@
                 <!-- Total Reviews -->
                 <div class="col-md-4">
                   <div class="rating-card text-center p-3 bg-light rounded">
-                    <i class="fas fa-users text-info fs-4 mb-2"></i>
+                    <Icon icon="mdi:account-group" class="text-info fs-4 mb-2" />
                     <div class="fw-bold fs-5">{{ currentRating.totalRatings }}</div>
                     <small class="text-muted">Total Reviews</small>
                   </div>
@@ -93,11 +93,11 @@
                 <!-- My Rating -->
                 <div class="col-md-4">
                   <div class="rating-card text-center p-3 bg-light rounded">
-                    <i class="fas fa-user text-primary fs-4 mb-2"></i>
+                    <Icon icon="mdi:account" class="text-primary fs-4 mb-2" />
                     <div v-if="currentUser" class="fw-bold fs-5">
                       <span v-if="myRating">
                         {{ myRating.rating }}
-                        <i class="fas fa-star text-warning ms-1"></i>
+                        <Icon icon="mdi:star" class="text-warning fs-4 mb-2" />
                       </span>
                       <span v-else class="text-muted">Not Rated</span>
                     </div>
@@ -139,13 +139,13 @@
             <!-- Action Buttons -->
             <div class="d-flex gap-2 flex-wrap">
               <button class="btn btn-primary">
-                <i class="fas fa-heart me-2"></i>Save Recipe
+                <Icon icon="mdi:heart" class="text-warning ms-1" />Save Recipe
               </button>
               <button class="btn btn-outline-primary">
-                <i class="fas fa-share me-2"></i>Share
+                <Icon icon="mdi:share-variant" class="me-2" />Share
               </button>
               <button class="btn btn-outline-secondary">
-                <i class="fas fa-print me-2"></i>Print
+                <Icon icon="mdi:printer" class="me-2" />Print
               </button>
             </div>
           </div>
@@ -159,7 +159,7 @@
           <div class="card h-100 shadow-sm">
             <div class="card-header bg-primary text-white">
               <h4 class="card-title mb-0">
-                <i class="fas fa-list-ul me-2"></i>Ingredients
+                <Icon icon="mdi:format-list-bulleted" class="me-2" />Ingredients
               </h4>
             </div>
             <div class="card-body">
@@ -191,7 +191,7 @@
           <div class="card h-100 shadow-sm">
             <div class="card-header bg-success text-white">
               <h4 class="card-title mb-0">
-                <i class="fas fa-clipboard-list me-2"></i>Instructions
+                <Icon icon="mdi:clipboard-list" class="me-2" />Instructions
               </h4>
             </div>
             <div class="card-body">
@@ -222,7 +222,7 @@
           <div class="card shadow-sm">
             <div class="card-header bg-info text-white">
               <h4 class="card-title mb-0">
-                <i class="fas fa-comments me-2"></i>User Reviews ({{ userReviews.length }})
+                <Icon icon="mdi:comment-text" class="me-2" />User Reviews ({{ userReviews.length }})
               </h4>
             </div>
             <div class="card-body">
@@ -235,7 +235,7 @@
                   <div class="d-flex justify-content-between align-items-start mb-2">
                     <div class="d-flex align-items-center">
                       <div class="user-avatar me-2">
-                        <i class="fas fa-user-circle fa-2x text-muted"></i>
+                        <Icon icon="mdi:account-circle" class="fs-1 text-muted" />
                       </div>
                       <div>
                         <div class="fw-bold">User {{ review.userId.slice(-4) }}</div>
@@ -267,7 +267,7 @@
           <div class="card shadow-sm">
             <div class="card-header bg-warning text-dark">
               <h4 class="card-title mb-0">
-                <i class="fas fa-exchange-alt me-2"></i>Ingredient Alternatives
+                <Icon icon="mdi:swap-horizontal" class="me-2" />Ingredient Alternatives
               </h4>
               <small class="text-muted">Substitute ingredients based on dietary preferences or availability</small>
             </div>
@@ -281,7 +281,7 @@
                   <div class="alternative-item p-3 border rounded">
                     <div class="fw-bold text-primary mb-1">{{ ingredient }}</div>
                     <div class="text-muted">
-                      <i class="fas fa-arrow-right me-2"></i>{{ alternative }}
+                      <Icon icon="mdi:arrow-right" class="me-2" />{{ alternative }}
                     </div>
                   </div>
                 </div>
@@ -296,7 +296,7 @@
         <div class="col-12">
           <div class="d-flex justify-content-between align-items-center">
             <router-link to="/recipes" class="btn btn-outline-secondary">
-              <i class="fas fa-arrow-left me-2"></i>Back to Recipes
+              <Icon icon="mdi:arrow-left" class="me-2" />Back to Recipes
             </router-link>
             <div class="d-flex gap-2">
               <button 
@@ -304,14 +304,14 @@
                 :disabled="!previousRecipe"
                 class="btn btn-outline-primary"
               >
-                <i class="fas fa-chevron-left me-2"></i>Previous
+                <Icon icon="mdi:chevron-left" class="me-2" />Previous
               </button>
               <button 
                 @click="goToNextRecipe" 
                 :disabled="!nextRecipe"
                 class="btn btn-outline-primary"
               >
-                Next<i class="fas fa-chevron-right ms-2"></i>
+                Next<Icon icon="mdi:chevron-right" class="ms-2" />
               </button>
             </div>
           </div>
@@ -325,11 +325,11 @@
         <div class="col-md-6 text-center">
           <div class="card">
             <div class="card-body py-5">
-              <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+              <Icon icon="mdi:alert" class="text-warning mb-3" style="font-size: 3rem" />
               <h3 class="text-muted">Recipe Not Found</h3>
               <p class="text-muted mb-4">The recipe you're looking for doesn't exist or has been removed.</p>
               <router-link to="/recipes" class="btn btn-primary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Recipes
+                <Icon icon="mdi:arrow-left" class="me-2" />Back to Recipes
               </router-link>
             </div>
           </div>

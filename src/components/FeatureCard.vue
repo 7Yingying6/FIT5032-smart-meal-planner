@@ -2,7 +2,7 @@
   <div class="feature-card h-100 p-4 rounded-4 shadow-lg border-0">
     <div class="text-center mb-4">
       <div class="feature-icon-wrapper">
-        <i :class="['fa-3x text-success', iconClass]"></i>
+        <Icon :icon="icon" class="text-success" style="font-size: 3rem"></Icon>
       </div>
     </div>
     <h4 class="text-center mb-3 fw-bold">{{ title }}</h4>
@@ -24,7 +24,7 @@ export default {
       type: String,
       required: true
     },
-    iconClass: {
+    icon: {
       type: String,
       required: true
     }

@@ -3,18 +3,19 @@
     <!-- Display mode: show average rating -->
     <div v-if="mode === 'display'" class="d-flex align-items-center">
       <div class="stars me-2">
-        <i 
-          v-for="star in 5" 
+        <Icon
+          v-for="star in 5"
           :key="star"
           class="star"
-          :class="getStarClass(star)"
-        ></i>
+          :icon="getStarIcon(star)"
+          :class="getStarColorClass(star)"
+        />
       </div>
       <span v-if="totalRatings > 0" class="rating-text text-muted small">
         {{ averageRating.toFixed(1) }} ({{ totalRatings }} {{ totalRatings === 1 ? 'review' : 'reviews' }})
       </span>
       <span v-else class="rating-text text-muted small fst-italic">
-        <i class="fas fa-star-half-alt me-1"></i>No ratings yet - Be the first to rate!
+        <Icon icon="mdi:star-half-full" class="me-1" />No ratings yet - Be the first to rate!
       </span>
     </div>
 
@@ -25,15 +26,16 @@
       </div>
       <div class="d-flex align-items-center mb-2">
         <div class="stars me-2">
-          <i 
-            v-for="star in 5" 
+          <Icon
+            v-for="star in 5"
             :key="star"
             class="star interactive"
-            :class="getInteractiveStarClass(star)"
+            :icon="getInteractiveStarIcon(star)"
+            :class="getInteractiveStarColorClass(star)"
             @click="setRating(star)"
             @mouseover="hoverRating = star"
             @mouseleave="hoverRating = 0"
-          ></i>
+          />
         </div>
         <span v-if="currentRating > 0" class="rating-text text-muted small">
           {{ getRatingText(currentRating) }}
@@ -74,13 +76,13 @@
       
       <!-- Success message -->
       <div v-if="successMessage" class="alert alert-success alert-dismissible fade show mt-2" role="alert">
-        <i class="fas fa-check-circle me-2"></i>{{ successMessage }}
+        <Icon icon="mdi:check-circle" class="me-2" />{{ successMessage }}
         <button type="button" class="btn-close" @click="successMessage = ''" aria-label="Close"></button>
       </div>
       
       <!-- Error message -->
       <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
-        <i class="fas fa-exclamation-triangle me-2"></i>{{ errorMessage }}
+        <Icon icon="mdi:alert" class="me-2" />{{ errorMessage }}
         <button type="button" class="btn-close" @click="errorMessage = ''" aria-label="Close"></button>
       </div>
     </div>
@@ -144,23 +146,30 @@ export default {
     }
   },
   methods: {
-    getStarClass(star) {
+    getStarIcon(star) {
       const rating = this.averageRating
       if (star <= Math.floor(rating)) {
-        return 'fas fa-star text-warning' // Full star
+        return 'mdi:star' // Full star
       } else if (star === Math.ceil(rating) && rating % 1 !== 0) {
-        return 'fas fa-star-half-alt text-warning' // Half star
+        return 'mdi:star-half-full' // Half star
       } else {
-        return 'far fa-star text-muted' // Empty star
+        return 'mdi:star-outline' // Empty star
       }
     },
-    getInteractiveStarClass(star) {
-      const rating = this.hoverRating || this.currentRating
-      if (star <= rating) {
-        return 'fas fa-star text-warning'
-      } else {
-        return 'far fa-star text-muted'
+    getStarColorClass(star) {
+      const rating = this.averageRating
+      if (star <= Math.floor(rating) || (star === Math.ceil(rating) && rating % 1 !== 0)) {
+        return 'text-warning'
       }
+      return 'text-muted'
+    },
+    getInteractiveStarIcon(star) {
+      const rating = this.hoverRating || this.currentRating
+      return star <= rating ? 'mdi:star' : 'mdi:star-outline'
+    },
+    getInteractiveStarColorClass(star) {
+      const rating = this.hoverRating || this.currentRating
+      return star <= rating ? 'text-warning' : 'text-muted'
     },
     setRating(rating) {
       // Clear any previous error messages

@@ -3,12 +3,12 @@
     <!-- Hero Section -->
     <section class="hero-section text-white py-5">
       <div class="hero-overlay"></div>
-      <div class="container position-relative">
+      <div class="container-fluid position-relative px-0">
         <div class="row align-items-center min-vh-75">
           <div class="col-lg-6">
             <div class="hero-content">
               <h1 class="display-3 fw-bold mb-4 hero-title">
-                <i class="fas fa-leaf me-3 text-success"></i>
+                <Icon icon="mdi:leaf" class="me-3 text-success" />
                 Smart Meal Planner
               </h1>
               <div class="executive-summary">
@@ -20,11 +20,11 @@
               </div>
               <div class="d-flex gap-3 flex-wrap">
                 <router-link to="/recipes" class="btn btn-success btn-lg px-4 py-3 rounded-pill">
-                  <i class="fas fa-book me-2"></i>
+                  <Icon icon="mdi:book-open-page-variant" class="me-2" />
                   Explore Recipes
                 </router-link>
                 <router-link to="/meal-plan" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill">
-                  <i class="fas fa-calendar-week me-2"></i>
+                  <Icon icon="mdi:calendar-week" class="me-2" />
                   Plan Meals
                 </router-link>
               </div>
@@ -34,16 +34,16 @@
             <div class="hero-image">
               <div class="floating-elements">
                 <div class="floating-icon floating-icon-1">
-                  <i class="fas fa-apple-alt fa-3x text-success"></i>
+                  <Icon icon="mdi:apple" class="text-success" style="font-size: 3rem" />
                 </div>
                 <div class="floating-icon floating-icon-2">
-                  <i class="fas fa-carrot fa-2x text-warning"></i>
+                  <Icon icon="mdi:carrot" class="text-warning" style="font-size: 2rem" />
                 </div>
                 <div class="floating-icon floating-icon-3">
-                  <i class="fas fa-fish fa-2x text-info"></i>
+                  <Icon icon="mdi:fish" class="text-info" style="font-size: 2rem" />
                 </div>
                 <div class="main-icon">
-                  <i class="fas fa-utensils fa-6x text-white opacity-75"></i>
+                  <Icon icon="mdi:silverware-fork-knife" class="text-white opacity-75" style="font-size: 6rem" />
                 </div>
               </div>
             </div>
@@ -67,7 +67,7 @@
             <FeatureCard
               title="Recipe Discovery"
               description="Browse through curated recipes with detailed ingredients, cooking steps, and nutritional information. Filter by cooking time, dietary preferences, and difficulty level."
-              icon-class="fas fa-book"
+              icon="mdi:book-open-page-variant"
             />
           </div>
           
@@ -75,7 +75,7 @@
             <FeatureCard
               title="Weekly Planning"
               description="Generate personalized weekly meal plans with smart recipe suggestions. Easily replace meals and adjust portions based on your preferences."
-              icon-class="fas fa-calendar-week"
+              icon="mdi:calendar-week"
             />
           </div>
           
@@ -83,7 +83,7 @@
             <FeatureCard
               title="Responsive Design"
               description="Access your meal plans anywhere with our fully responsive design. Optimized for desktop, tablet, and mobile devices."
-              icon-class="fas fa-mobile-alt"
+              icon="mdi:cellphone"
             />
           </div>
         </div>
@@ -115,7 +115,7 @@
                 >
                 <div class="recipe-badge">
                   <span class="badge bg-warning text-dark">
-                    <i class="fas fa-star me-1"></i>{{ getRating(recipe.id).toFixed(1) }}
+                    <Icon icon="mdi:star" class="me-1" />{{ getRating(recipe.id).toFixed(1) }}
                   </span>
                 </div>
               </div>
@@ -125,12 +125,12 @@
                 <div class="recipe-meta d-flex justify-content-between align-items-center">
                   <span class="badge bg-primary">{{ recipe.category }}</span>
                   <small class="text-muted">
-                    <i class="fas fa-clock me-1"></i>{{ recipe.cookingTime }}min
+                    <Icon icon="mdi:clock-outline" class="me-1" />{{ recipe.cookingTime }}min
                   </small>
                 </div>
                 <div class="mt-2">
                   <small class="text-muted">
-                    <i class="fas fa-users me-1"></i>{{ getRatingCount(recipe.id) }} reviews
+                    <Icon icon="mdi:account-group" class="me-1" />{{ getRatingCount(recipe.id) }} reviews
                   </small>
                 </div>
               </div>
@@ -142,7 +142,7 @@
           <div class="col-12 text-center py-4">
             <p class="text-muted">No rated recipes yet. Be the first to rate our recipes!</p>
             <router-link to="/recipes" class="btn btn-primary">
-              <i class="fas fa-utensils me-2"></i>Browse Recipes
+              <Icon icon="mdi:silverware-fork-knife" class="me-2" />Browse Recipes
             </router-link>
           </div>
         </div>
@@ -150,7 +150,7 @@
         <div class="row mt-4">
           <div class="col-12 text-center">
             <router-link to="/recipes" class="btn btn-outline-primary btn-lg">
-              <i class="fas fa-arrow-right me-2"></i>View All Recipes
+              <Icon icon="mdi:arrow-right" class="me-2" />View All Recipes
             </router-link>
           </div>
         </div>
@@ -168,7 +168,7 @@
                 Join thousands of users who have transformed their eating habits with our smart meal planning platform.
               </p>
               <router-link to="/auth" class="btn btn-light btn-lg px-5 py-3 rounded-pill fw-bold">
-                <i class="fas fa-user-plus me-2"></i>
+                <Icon icon="mdi:account-plus" class="me-2" />
                 Get Started Today
               </router-link>
             </div>

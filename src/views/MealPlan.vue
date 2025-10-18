@@ -6,7 +6,7 @@
         <div class="row align-items-center">
           <div class="col-md-8">
             <h1 class="display-4 mb-2 page-title">
-              <i class="fas fa-calendar-alt me-3"></i>Weekly Meal Plan
+              <Icon icon="mdi:calendar-month" class="me-3" />Weekly Meal Plan
             </h1>
             <p class="lead mb-0">Your personalized meal plan for the week</p>
           </div>
@@ -16,7 +16,7 @@
               class="btn btn-light btn-lg"
               :disabled="isGenerating"
             >
-              <i class="fas fa-sync-alt me-2" :class="{ 'fa-spin': isGenerating }"></i>
+              <Icon icon="mdi:sync" class="me-2" :class="{ 'icon-spin': isGenerating }" />
               {{ isGenerating ? 'Generating...' : 'New Plan' }}
             </button>
           </div>
@@ -33,28 +33,28 @@
               <div class="row text-center">
                 <div class="col-6 col-md-3">
                   <div class="summary-stat">
-                    <i class="fas fa-utensils text-success fs-2 mb-2"></i>
+                    <Icon icon="mdi:silverware-fork-knife" class="text-success fs-2 mb-2" />
                     <h4 class="mb-1">{{ mealPlan.length }}</h4>
                     <small class="text-muted">Meals Planned</small>
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
                   <div class="summary-stat">
-                    <i class="fas fa-clock text-primary fs-2 mb-2"></i>
+                    <Icon icon="mdi:clock-outline" class="text-primary fs-2 mb-2" />
                     <h4 class="mb-1">{{ totalCookingTime }} min</h4>
                     <small class="text-muted">Total Cook Time</small>
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
                   <div class="summary-stat">
-                    <i class="fas fa-fire text-danger fs-2 mb-2"></i>
+                    <Icon icon="mdi:fire" class="text-danger fs-2 mb-2" />
                     <h4 class="mb-1">{{ totalCalories }}</h4>
                     <small class="text-muted">Total Calories</small>
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
                   <div class="summary-stat">
-                    <i class="fas fa-users text-warning fs-2 mb-2"></i>
+                    <Icon icon="mdi:account-group" class="text-warning fs-2 mb-2" />
                     <h4 class="mb-1">{{ averageServings }}</h4>
                     <small class="text-muted">Avg Servings</small>
                   </div>
@@ -85,7 +85,7 @@
               </div>
               <div class="position-absolute top-0 start-0 m-2">
                 <span class="badge bg-dark">
-                  <i class="fas fa-clock me-1"></i>{{ meal.cookingTime }}min
+                  <Icon icon="mdi:clock-outline" class="me-1" />{{ meal.cookingTime }}min
                 </span>
               </div>
             </div>
@@ -103,19 +103,19 @@
                 <div class="row text-center">
                   <div class="col-4">
                     <small class="text-muted">
-                      <i class="fas fa-users"></i><br>
+                      <Icon icon="mdi:account-group" /><br>
                       {{ meal.servings }}
                     </small>
                   </div>
                   <div class="col-4">
                     <small class="text-muted">
-                      <i class="fas fa-fire"></i><br>
+                      <Icon icon="mdi:fire" /><br>
                       {{ meal.calories }}
                     </small>
                   </div>
                   <div class="col-4">
                     <small class="text-muted">
-                      <i class="fas fa-chart-line"></i><br>
+                      <Icon icon="mdi:chart-line" /><br>
                       {{ meal.difficulty }}
                     </small>
                   </div>
@@ -141,10 +141,7 @@
                   :disabled="isReplacing === index"
                   title="Replace this meal"
                 >
-                  <i 
-                    class="fas fa-sync-alt me-2" 
-                    :class="{ 'fa-spin': isReplacing === index }"
-                  ></i>
+                  <Icon icon="mdi:sync" class="me-2" :class="{ 'icon-spin': isReplacing === index }" />
                   {{ isReplacing === index ? 'Replacing...' : 'Replace Meal' }}
                 </button>
               </div>
@@ -159,12 +156,12 @@
           <div class="card shadow-sm">
             <div class="card-header bg-info text-white">
               <h4 class="card-title mb-0">
-                <i class="fas fa-shopping-cart me-2"></i>Shopping List
+                <Icon icon="mdi:cart" class="me-2" />Shopping List
                 <button 
                   @click="toggleShoppingList" 
                   class="btn btn-sm btn-light float-end"
                 >
-                  <i class="fas" :class="showShoppingList ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                  <Icon :icon="showShoppingList ? 'mdi:chevron-up' : 'mdi:chevron-down'" />
                 </button>
               </h4>
             </div>
@@ -172,7 +169,7 @@
               <div class="row">
                 <div class="col-md-6">
                   <h6 class="text-muted mb-3">
-                    <i class="fas fa-list me-2"></i>All Ingredients
+                    <Icon icon="mdi:format-list-bulleted" class="me-2" />All Ingredients
                   </h6>
                   <ul class="list-unstyled shopping-list">
                     <li 
@@ -196,7 +193,7 @@
                 </div>
                 <div class="col-md-6">
                   <h6 class="text-muted mb-3">
-                    <i class="fas fa-info-circle me-2"></i>Shopping Tips
+                    <Icon icon="mdi:information-outline" class="me-2" />Shopping Tips
                   </h6>
                   <div class="alert alert-info">
                     <ul class="mb-0">
@@ -219,8 +216,7 @@
           <div class="card shadow-sm">
             <div class="card-header bg-light">
               <h5 class="mb-0 d-flex align-items-center">
-                <i class="fas fa-table me-2 text-success"></i>
-                Interactive Shopping Table
+                <Icon icon="mdi:table" class="me-2" />Shopping List
               </h5>
             </div>
             <div class="card-body">
@@ -235,14 +231,14 @@
         <div class="col-12 text-center">
           <div class="d-flex justify-content-center gap-3 flex-wrap">
             <button @click="generateNewPlan" class="btn btn-success btn-lg">
-              <i class="fas fa-magic me-2"></i>Generate New Plan
+              <Icon icon="mdi:wand" class="me-2" />Generate New Plan
             </button>
             <button @click="savePlan" class="btn btn-primary btn-lg">
-              <i class="fas fa-save me-2"></i>Save Plan
+              <Icon icon="mdi:content-save" class="me-2" />Save Plan
             </button>
             <button @click="toggleExportOptions" class="btn btn-outline-secondary btn-lg">
-              <i class="fas fa-download me-2"></i>Export
-              <i class="fas" :class="showExportOptions ? 'fa-chevron-up ms-1' : 'fa-chevron-down ms-1'"></i>
+              <Icon icon="mdi:download" class="me-2" />Export
+              <Icon :icon="showExportOptions ? 'mdi:chevron-up' : 'mdi:chevron-down'" class="ms-1" />
             </button>
           </div>
         </div>
@@ -255,16 +251,16 @@
             <div class="card-body">
               <div class="d-flex justify-content-center gap-2 flex-wrap">
                 <button @click="exportShoppingListCSV" class="btn btn-outline-secondary">
-                  <i class="fas fa-file-csv me-2"></i>Shopping List (CSV)
+                  <Icon icon="mdi:file-delimited" class="me-2" />Shopping List (CSV)
                 </button>
                 <button @click="exportShoppingListPDF" class="btn btn-outline-secondary">
-                  <i class="fas fa-file-pdf me-2"></i>Shopping List (PDF)
+                  <Icon icon="mdi:file-pdf-box" class="me-2" />Shopping List (PDF)
                 </button>
                 <button @click="exportWeekPlanCSV" class="btn btn-outline-secondary">
-                  <i class="fas fa-file-csv me-2"></i>Weekly Plan (CSV)
+                  <Icon icon="mdi:file-delimited" class="me-2" />Weekly Plan (CSV)
                 </button>
                 <button @click="exportWeekPlanPDF" class="btn btn-outline-secondary">
-                  <i class="fas fa-file-pdf me-2"></i>Weekly Plan (PDF)
+                  <Icon icon="mdi:file-pdf-box" class="me-2" />Weekly Plan (PDF)
                 </button>
               </div>
             </div>
@@ -560,7 +556,7 @@ export default {
   letter-spacing: 0.2px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
 }
-.page-title .fa-calendar-alt {
+.page-title .iconify {
   color: var(--color-green-400);
 }
 
@@ -568,4 +564,8 @@ export default {
   color: rgba(0, 0, 0, 0.70);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
 }
+@keyframes icon-rotate {
+  100% { transform: rotate(360deg); }
+}
+.icon-spin { animation: icon-rotate 1s linear infinite; }
 </style>

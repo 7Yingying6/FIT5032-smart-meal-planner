@@ -22,7 +22,7 @@
     >
       <slot name="header">
         <h4 v-if="title" class="card-title mb-0">
-          <i v-if="icon" :class="['me-2', icon]"></i>
+          <Icon v-if="icon" :icon="icon" class="me-2" />
           {{ title }}
         </h4>
         <small v-if="subtitle" class="text-muted">{{ subtitle }}</small>
@@ -54,8 +54,10 @@
 </template>
 
 <script>
+import { Icon } from '@iconify/vue'
 export default {
   name: 'BaseCard',
+  components: { Icon },
   props: {
     title: {
       type: String,
