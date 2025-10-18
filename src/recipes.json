@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "name": "Japanese Curry Rice",
+    "description": "Mild curry with chicken and vegetables, served over steamed rice.",
+    "category": "Asian",
+    "cookingTime": 30,
+    "difficulty": "Medium",
+    "calories": 560,
+    "image": "https://images.unsplash.com/photo-1604908177444-0d6d7b5dc5b2",
+    "tags": [
+      "japanese",
+      "curry",
+      "rice"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Sichuan Mala Hotpot Bowl",
+    "description": "Quick spicy hotpot with beef slices, tofu, and vegetables.",
+    "category": "Asian",
+    "cookingTime": 25,
+    "difficulty": "Medium",
+    "calories": 620,
+    "image": "https://images.unsplash.com/photo-1627308595229-7830a5c91f9f",
+    "tags": [
+      "spicy",
+      "beef",
+      "sichuan"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Beef Gyudon Rice Bowl",
+    "description": "Japanese-style simmered beef and onions over warm rice.",
+    "category": "Asian",
+    "cookingTime": 20,
+    "difficulty": "Easy",
+    "calories": 540,
+    "image": "https://images.unsplash.com/photo-1605478571920-7b4fa4a2e2a8",
+    "tags": [
+      "beef",
+      "rice",
+      "japanese"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Teriyaki Chicken Rice Bowl",
+    "description": "Grilled chicken glazed with teriyaki sauce, served with broccoli.",
+    "category": "Asian",
+    "cookingTime": 20,
+    "difficulty": "Easy",
+    "calories": 490,
+    "image": "https://images.unsplash.com/photo-1601050690597-6eaf3c87c8f3",
+    "tags": [
+      "chicken",
+      "japanese",
+      "quick"
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Shrimp Fried Rice",
+    "description": "Classic fried rice with shrimp, peas, and scrambled eggs.",
+    "category": "Asian",
+    "cookingTime": 20,
+    "difficulty": "Easy",
+    "calories": 510,
+    "image": "https://images.unsplash.com/photo-1625944230945-5172b4f19a20",
+    "tags": [
+      "rice",
+      "shrimp",
+      "chinese"
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Egg Udon Stir-Fry",
+    "description": "Quick stir-fried udon noodles with eggs, cabbage, and soy sauce.",
+    "category": "Asian",
+    "cookingTime": 15,
+    "difficulty": "Easy",
+    "calories": 470,
+    "image": "https://images.unsplash.com/photo-1627308595183-6f16e2b0b3c1",
+    "tags": [
+      "noodles",
+      "quick",
+      "japanese"
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Kimchi Fried Rice",
+    "description": "Korean-style fried rice with kimchi, egg, and gochujang sauce.",
+    "category": "Asian",
+    "cookingTime": 20,
+    "difficulty": "Easy",
+    "calories": 520,
+    "image": "https://images.unsplash.com/photo-1603133872878-684f94d21d5f",
+    "tags": [
+      "korean",
+      "rice",
+      "spicy"
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Garlic Butter Shrimp Noodles",
+    "description": "Pan-fried shrimp noodles with garlic butter and soy glaze.",
+    "category": "Asian",
+    "cookingTime": 20,
+    "difficulty": "Medium",
+    "calories": 530,
+    "image": "https://images.unsplash.com/photo-1601924582971-df34d7d1f2a2",
+    "tags": [
+      "seafood",
+      "noodles",
+      "fusion"
+    ]
+  },
+  {
+    "id": 9,
+    "name": "Vegetable Stir-Fry Bowl",
+    "description": "Mixed vegetables stir-fried with soy sauce and sesame oil.",
+    "category": "Asian",
+    "cookingTime": 15,
+    "difficulty": "Easy",
+    "calories": 370,
+    "image": "https://images.unsplash.com/photo-1617196036573-7c1e84b8c1b3",
+    "tags": [
+      "vegetarian",
+      "stir-fry",
+      "healthy"
+    ]
+  },
+  {
+    "id": 10,
+    "name": "Instant Ramen Upgrade",
+    "description": "Instant noodles topped with boiled egg, spinach, and corn.",
+    "category": "Asian",
+    "cookingTime": 10,
+    "difficulty": "Easy",
+    "calories": 430,
+    "image": "https://images.unsplash.com/photo-1589308078055-1408a5c31d94",
+    "tags": [
+      "ramen",
+      "student",
+      "quick"
+    ]
+  },
+  {
+    "id": 11,
+    "name": "Beef Steak with Garlic Butter",
+    "description": "Pan-seared steak topped with garlic butter and green beans.",
+    "category": "Western",
+    "cookingTime": 30,
+    "difficulty": "Medium",
+    "calories": 610,
+    "image": "https://images.unsplash.com/photo-1553163147-622ab57e7e6a",
+    "tags": [
+      "beef",
+      "protein",
+      "dinner"
+    ]
+  },
+  {
+    "id": 12,
+    "name": "Chicken Alfredo Pasta",
+    "description": "Creamy pasta with chicken breast and Parmesan sauce.",
+    "category": "Western",
+    "cookingTime": 25,
+    "difficulty": "Medium",
+    "calories": 580,
+    "image": "https://images.unsplash.com/photo-1603133872878-684f94d21d5f",
+    "tags": [
+      "pasta",
+      "chicken",
+      "comfort"
+    ]
+  },
+  {
+    "id": 13,
+    "name": "Tuna Sandwich",
+    "description": "Wholegrain bread filled with tuna, lettuce, and yogurt dressing.",
+    "category": "Western",
+    "cookingTime": 10,
+    "difficulty": "Easy",
+    "calories": 380,
+    "image": "https://images.unsplash.com/photo-1590080875839-4c88e91a88f3",
+    "tags": [
+      "sandwich",
+      "lunch",
+      "healthy"
+    ]
+  },
+  {
+    "id": 14,
+    "name": "Roasted Chicken Drumsticks",
+    "description": "Oven-baked drumsticks marinated in olive oil, herbs, and garlic.",
+    "category": "Western",
+    "cookingTime": 30,
+    "difficulty": "Medium",
+    "calories": 540,
+    "image": "https://images.unsplash.com/photo-1601050690597-6eaf3c87c8f3",
+    "tags": [
+      "chicken",
+      "oven",
+      "quick"
+    ]
+  },
+  {
+    "id": 15,
+    "name": "Spaghetti Bolognese",
+    "description": "Quick spaghetti with store-bought tomato and minced beef sauce.",
+    "category": "Western",
+    "cookingTime": 25,
+    "difficulty": "Easy",
+    "calories": 600,
+    "image": "https://images.unsplash.com/photo-1589308078055-1408a5c31d94",
+    "tags": [
+      "pasta",
+      "beef",
+      "easy"
+    ]
+  },
+  {
+    "id": 16,
+    "name": "Grilled Salmon with Asparagus",
+    "description": "Seared salmon served with lemon butter asparagus.",
+    "category": "Western",
+    "cookingTime": 20,
+    "difficulty": "Easy",
+    "calories": 490,
+    "image": "https://images.unsplash.com/photo-1586190848861-99aa4a171e90",
+    "tags": [
+      "seafood",
+      "salmon",
+      "healthy"
+    ]
+  },
+  {
+    "id": 17,
+    "name": "Vegetable Cheese Omelette",
+    "description": "Fluffy omelette filled with cheese, spinach, and tomato.",
+    "category": "Western",
+    "cookingTime": 10,
+    "difficulty": "Easy",
+    "calories": 330,
+    "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141",
+    "tags": [
+      "breakfast",
+      "eggs",
+      "vegetarian"
+    ]
+  },
+  {
+    "id": 18,
+    "name": "Creamy Mushroom Toast",
+    "description": "Wholegrain toast topped with creamy garlic mushrooms.",
+    "category": "Western",
+    "cookingTime": 15,
+    "difficulty": "Easy",
+    "calories": 360,
+    "image": "https://images.unsplash.com/photo-1565958011705-44a5e1b7e7b3",
+    "tags": [
+      "toast",
+      "vegetarian",
+      "lunch"
+    ]
+  },
+  {
+    "id": 19,
+    "name": "Avocado Egg Toast",
+    "description": "Toasted bread with mashed avocado and poached egg.",
+    "category": "Breakfast",
+    "cookingTime": 10,
+    "difficulty": "Easy",
+    "calories": 340,
+    "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141",
+    "tags": [
+      "breakfast",
+      "healthy",
+      "quick"
+    ]
+  },
+  {
+    "id": 20,
+    "name": "Yogurt Parfait Cup",
+    "description": "Layers of yogurt, granola, and seasonal fruits for a light start.",
+    "category": "Breakfast",
+    "cookingTime": 10,
+    "difficulty": "Easy",
+    "calories": 280,
+    "image": "https://images.unsplash.com/photo-1586201375761-83865001e17d",
+    "tags": [
+      "yogurt",
+      "fruit",
+      "fiber"
+    ]
+  },
+  {
+    "id": 21,
+    "name": "Ham & Cheese Sandwich",
+    "description": "Quick sandwich with ham, melted cheese, and lettuce.",
+    "category": "Breakfast",
+    "cookingTime": 10,
+    "difficulty": "Easy",
+    "calories": 400,
+    "image": "https://images.unsplash.com/photo-1606755962773-1a19b9a3c07f",
+    "tags": [
+      "sandwich",
+      "protein",
+      "snack"
+    ]
+  },
+  {
+    "id": 22,
+    "name": "Scrambled Eggs with Tomato",
+    "description": "Classic Chinese-style breakfast eggs with tomato and scallions.",
+    "category": "Breakfast",
+    "cookingTime": 10,
+    "difficulty": "Easy",
+    "calories": 310,
+    "image": "https://images.unsplash.com/photo-1592861956120-7a4e2533b4e4",
+    "tags": [
+      "eggs",
+      "asian",
+      "home"
+    ]
+  },
+  {
+    "id": 23,
+    "name": "Berry Overnight Oats",
+    "description": "Oats soaked overnight with milk and mixed berries.",
+    "category": "Breakfast",
+    "cookingTime": 10,
+    "difficulty": "Easy",
+    "calories": 290,
+    "image": "https://images.unsplash.com/photo-1590080875839-4c88e91a88f3",
+    "tags": [
+      "no-cook",
+      "oats",
+      "fiber"
+    ]
+  },
+  {
+    "id": 24,
+    "name": "Vegetable Egg Wrap",
+    "description": "Soft egg wrap with lettuce, carrot, and cheese filling.",
+    "category": "Breakfast",
+    "cookingTime": 15,
+    "difficulty": "Easy",
+    "calories": 350,
+    "image": "https://images.unsplash.com/photo-1617196036758-6d3bfaedbda3",
+    "tags": [
+      "wrap",
+      "breakfast",
+      "vegetarian"
+    ]
+  },
+  {
+    "id": 25,
+    "name": "Banana Pancakes",
+    "description": "Soft pancakes made with mashed bananas and eggs.",
+    "category": "Dessert",
+    "cookingTime": 15,
+    "difficulty": "Easy",
+    "calories": 320,
+    "image": "https://images.unsplash.com/photo-1606755962773-1a19b9a3c07f",
+    "tags": [
+      "pancake",
+      "sweet",
+      "breakfast"
+    ]
+  },
+  {
+    "id": 26,
+    "name": "Chocolate Mug Cake",
+    "description": "Quick microwave mug cake with cocoa and chocolate chips.",
+    "category": "Dessert",
+    "cookingTime": 10,
+    "difficulty": "Easy",
+    "calories": 390,
+    "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0",
+    "tags": [
+      "dessert",
+      "chocolate",
+      "microwave"
+    ]
+  },
+  {
+    "id": 27,
+    "name": "Matcha Cheesecake",
+    "description": "Smooth baked cheesecake infused with matcha green tea.",
+    "category": "Dessert",
+    "cookingTime": 30,
+    "difficulty": "Medium",
+    "calories": 460,
+    "image": "https://images.unsplash.com/photo-1612197527826-0e9d5ef2f2c2",
+    "tags": [
+      "dessert",
+      "matcha",
+      "japanese"
+    ]
+  },
+  {
+    "id": 28,
+    "name": "Mango Pudding",
+    "description": "Creamy mango pudding made with milk and fresh mango puree.",
+    "category": "Dessert",
+    "cookingTime": 20,
+    "difficulty": "Easy",
+    "calories": 310,
+    "image": "https://images.unsplash.com/photo-1605478048823-9366c47e3f85",
+    "tags": [
+      "pudding",
+      "fruit",
+      "sweet"
+    ]
+  },
+  {
+    "id": 29,
+    "name": "Tiramisu Cup",
+    "description": "Layered dessert with coffee-soaked biscuits and mascarpone cream.",
+    "category": "Dessert",
+    "cookingTime": 20,
+    "difficulty": "Medium",
+    "calories": 420,
+    "image": "https://images.unsplash.com/photo-1617196036573-7c1e84b8c1b3",
+    "tags": [
+      "italian",
+      "coffee",
+      "cream"
+    ]
+  },
+  {
+    "id": 30,
+    "name": "Chocolate Mousse",
+    "description": "Light chocolate mousse topped with whipped cream.",
+    "category": "Dessert",
+    "cookingTime": 20,
+    "difficulty": "Medium",
+    "calories": 400,
+    "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0",
+    "tags": [
+      "dessert",
+      "chocolate",
+      "quick"
+    ]
+  }
+]

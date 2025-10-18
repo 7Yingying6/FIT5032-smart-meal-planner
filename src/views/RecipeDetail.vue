@@ -163,7 +163,7 @@
               </h4>
             </div>
             <div class="card-body">
-              <ul class="list-unstyled ingredients-list">
+              <ul class="list-unstyled ingredients-list" v-if="recipe && recipe.ingredients && recipe.ingredients.length">
                 <li 
                   v-for="(ingredient, index) in recipe.ingredients" 
                   :key="index"
@@ -182,6 +182,7 @@
                   </label>
                 </li>
               </ul>
+              <p v-if="recipe && (!recipe.ingredients || recipe.ingredients.length === 0)" class="text-muted px-3 py-2 mb-0">No ingredients provided for this recipe.</p>
             </div>
           </div>
         </div>
@@ -195,7 +196,7 @@
               </h4>
             </div>
             <div class="card-body">
-              <ol class="instructions-list">
+              <ol class="instructions-list" v-if="recipe && recipe.instructions && recipe.instructions.length">
                 <li 
                   v-for="(instruction, index) in recipe.instructions" 
                   :key="index"
@@ -211,6 +212,7 @@
                   </div>
                 </li>
               </ol>
+              <p v-if="recipe && (!recipe.instructions || recipe.instructions.length === 0)" class="text-muted px-3 py-2 mb-0">No instructions provided for this recipe.</p>
             </div>
           </div>
         </div>
@@ -340,10 +342,13 @@
 </template>
 
 <script>
-import recipesData from '@/data/recipes.json'
+// import recipesData from '@/data/recipes.json'
 import StarRating from '@/components/StarRating.vue'
 import { getRecipeRatings, getUserRating } from '@/utils/ratingStorage'
 import userStorage from '@/utils/userStorage'
+// Firestore imports
+import { collection, getDocs } from 'firebase/firestore'
+import { db } from '@/firebase'
 
 export default {
   name: 'RecipeDetail',
@@ -352,7 +357,7 @@ export default {
   },
   data() {
     return {
-      recipes: recipesData,
+      recipes: [],
       currentRating: {
         averageRating: 0,
         totalRatings: 0
@@ -364,8 +369,8 @@ export default {
   },
   computed: {
     recipe() {
-      const id = parseInt(this.$route.params.id)
-      return this.recipes.find(recipe => recipe.id === id)
+      const id = Number(this.$route.params.id)
+      return this.recipes.find(r => Number(r.id) === id)
     },
     currentIndex() {
       if (!this.recipe) return -1
@@ -381,9 +386,40 @@ export default {
     }
   },
   mounted() {
-    this.loadRatingData()
+    // Load recipes from Firestore first, then rating data
+    this.loadRecipes().then(() => {
+      this.loadRatingData()
+    })
   },
   methods: {
+    // Load recipes from Firestore and normalize fields
+    async loadRecipes() {
+      try {
+        const snapshot = await getDocs(collection(db, 'recipes'))
+        this.recipes = snapshot.docs.map(doc => {
+          const data = doc.data() || {}
+          return {
+            id: data.id != null ? data.id : doc.id,
+            title: data.title || data.name || 'Untitled Recipe',
+            description: data.description || '',
+            image: data.image || '',
+            category: data.category || 'General',
+            cookingTime: data.cookingTime || 0,
+            difficulty: data.difficulty || 'Easy',
+            servings: data.servings || 1,
+            calories: data.calories || 0,
+            tags: Array.isArray(data.tags) ? data.tags : [],
+            ingredients: Array.isArray(data.ingredients) ? data.ingredients : [],
+            instructions: Array.isArray(data.instructions) ? data.instructions : [],
+            alternatives: data.alternatives || null,
+            averageRating: typeof data.averageRating === 'number' ? data.averageRating : 0,
+            totalRatings: typeof data.totalRatings === 'number' ? data.totalRatings : 0
+          }
+        })
+      } catch (e) {
+        console.error('Failed to load recipes from Firestore', e)
+      }
+    },
     goToPreviousRecipe() {
       if (this.previousRecipe) {
         this.$router.push(`/recipe/${this.previousRecipe.id}`)
@@ -402,11 +438,7 @@ export default {
           totalRatings: ratingData.totalRatings || this.recipe.totalRatings || 0
         }
         this.userReviews = ratingData.ratings || []
-        
-        // Get current user
         this.currentUser = userStorage.getCurrentUser()
-        
-        // Get user's rating for this recipe
         if (this.currentUser) {
           this.myRating = getUserRating(this.recipe.id, this.currentUser.id)
         } else {
@@ -415,10 +447,7 @@ export default {
       }
     },
     handleRatingUpdate(data) {
-      // Reload rating data after user submits/updates rating
       this.loadRatingData()
-      
-      // Show success message
       if (data.removed) {
         this.showMessage('Rating removed successfully!', 'success')
       } else {
@@ -434,7 +463,6 @@ export default {
       })
     },
     showMessage(message, type = 'info') {
-      // Simple message display - could be enhanced with toast notifications
       console.log(`${type.toUpperCase()}: ${message}`)
     }
   },

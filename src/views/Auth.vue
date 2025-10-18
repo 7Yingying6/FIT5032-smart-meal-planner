@@ -140,7 +140,7 @@
                   >
                     <option value="">Select your role</option>
                     <option value="user">Regular User</option>
-                    <option value="admin">Administrator</option>
+                    <option value="nutritionist">Nutritionist</option>
                   </select>
                   <div v-if="errors.userRole" class="invalid-feedback">
                     {{ errors.userRole }}
@@ -148,7 +148,7 @@
                   <div class="form-text">
                     <small class="text-muted">
                       <Icon icon="mdi:information-outline" class="me-1" />
-                      Regular users can browse and save recipes. Administrators have additional management features.
+                      Regular users can browse and save recipes. Nutritionists have additional management features.
                     </small>
                   </div>
                 </div>
@@ -186,7 +186,7 @@
                       class="form-check-input"
                     >
                     <label for="rememberMe" class="form-check-label">
-                      Remember me for 30 days
+                      Remember me for 7 days
                     </label>
                   </div>
                 </div>
@@ -249,9 +249,8 @@
               </div>
               <div class="demo-credentials mb-2">
                 <small class="text-muted">
-                  <strong>Robby</strong><br>
-                  robby@gmail.com<br>
-                  Password: Robby20010922
+                  <strong>Robby (Demo)</strong><br>
+                  Use Quick Login to sign in
                 </small>
               </div>
                      <button 
@@ -273,9 +272,8 @@
                      </div>
                      <div class="demo-credentials mb-2">
                 <small class="text-muted">
-                  <strong>Dr. Emily Chen</strong><br>
-                  emily.chen@gmail.com<br>
-                  Password: nutritionist123
+                  <strong>Dr. Emily Chen (Demo)</strong><br>
+                  Use Quick Login to sign in
                 </small>
               </div>
                      <button 
@@ -326,22 +324,16 @@ export default {
         student: {
           firstName: 'Robby',
           lastName: '',
-          email: 'robby@gmail.com',
-          password: 'Robby20010922',
           role: 'student'
         },
         nutritionist: {
           firstName: 'Emily',
           lastName: 'Chen',
-          email: 'emily.chen@gmail.com',
-          password: 'nutritionist123',
           role: 'nutritionist'
         },
         administrator: {
           firstName: 'Admin',
           lastName: 'User',
-          email: 'admin@fit.edu',
-          password: 'admin123',
           role: 'administrator'
         }
       }
@@ -563,6 +555,19 @@ export default {
       alert(`${message} ${welcomeText}`)
     },
     
+    clearForm() {
+      this.form = {
+        fullName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        userRole: '',
+        agreeTerms: false,
+        rememberMe: false
+      };
+      this.showPassword = false;
+    },
+    
     showErrorMessage(message) {
       alert(`Error: ${message}`)
     },
@@ -583,11 +588,31 @@ export default {
           return;
         }
   
-        const credential = await signInWithEmailAndPassword(auth, demoUser.email, demoUser.password);
+        const envMap = {
+          student: {
+            email: import.meta.env.VITE_DEMO_STUDENT_EMAIL,
+            password: import.meta.env.VITE_DEMO_STUDENT_PASSWORD
+          },
+          nutritionist: {
+            email: import.meta.env.VITE_DEMO_NUTRITIONIST_EMAIL,
+            password: import.meta.env.VITE_DEMO_NUTRITIONIST_PASSWORD
+          },
+          administrator: {
+            email: import.meta.env.VITE_DEMO_ADMIN_EMAIL,
+            password: import.meta.env.VITE_DEMO_ADMIN_PASSWORD
+          }
+        };
+        const creds = envMap[userType];
+        if (!creds?.email || !creds?.password) {
+          this.showErrorMessage('Demo credentials not configured.');
+          return;
+        }
+  
+        const credential = await signInWithEmailAndPassword(auth, creds.email, creds.password);
         const uid = credential?.user?.uid || auth.currentUser?.uid || Date.now().toString();
         const userData = {
           id: uid,
-          email: demoUser.email,
+          email: creds.email,
           firstName: demoUser.firstName,
           lastName: demoUser.lastName,
           role: demoUser.role

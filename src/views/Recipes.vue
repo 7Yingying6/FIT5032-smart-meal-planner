@@ -131,75 +131,87 @@
 </template>
 
 <script>
-import recipesData from '@/data/recipes.json'
 import RecipeCard from '@/components/RecipeCard.vue'
 import { getRecipeRatings } from '@/utils/ratingStorage'
+import { collection, getDocs } from 'firebase/firestore'
+import { db } from '../firebase'
+import { ref, onMounted, computed } from 'vue'
 
 export default {
   name: 'Recipes',
   components: {
     RecipeCard
   },
-  data() {
-    return {
-      recipes: recipesData,
-      selectedCategory: '',
-      maxCookingTime: '',
-      selectedDifficulty: '',
-      sortBy: 'default'
-    }
-  },
-  computed: {
-    filteredRecipes() {
-      let filtered = this.recipes
-      
-      // Filter by category
-      if (this.selectedCategory) {
-        filtered = filtered.filter(recipe => 
-          recipe.category === this.selectedCategory
-        )
-      }
-      
-      // Filter by cooking time
-      if (this.maxCookingTime) {
-        filtered = filtered.filter(recipe => 
-          recipe.cookingTime <= parseInt(this.maxCookingTime)
-        )
-      }
-      
-      // Filter by difficulty
-      if (this.selectedDifficulty) {
-        filtered = filtered.filter(recipe => 
-          recipe.difficulty === this.selectedDifficulty
-        )
-      }
-      
-      // Sort recipes
-      if (this.sortBy === 'Rating: High to Low') {
-        filtered = filtered.sort((a, b) => {
-          const ratingA = a.averageRating || 0
-          const ratingB = b.averageRating || 0
-          return ratingB - ratingA
+  setup() {
+    const recipes = ref([])
+    const selectedCategory = ref('')
+    const maxCookingTime = ref('')
+    const selectedDifficulty = ref('')
+    const sortBy = ref('default')
+
+    onMounted(async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'recipes'))
+        recipes.value = snapshot.docs.map(doc => {
+          const data = doc.data() || {}
+          return {
+            id: data.id != null ? data.id : doc.id,
+            title: data.title || data.name || 'Untitled Recipe',
+            description: data.description || '',
+            image: data.image || '',
+            category: data.category || 'General',
+            cookingTime: data.cookingTime || 0,
+            difficulty: data.difficulty || 'Easy',
+            servings: data.servings || 1,
+            calories: data.calories || 0,
+            tags: Array.isArray(data.tags) ? data.tags : [],
+            averageRating: typeof data.averageRating === 'number' ? data.averageRating : 0,
+            totalRatings: typeof data.totalRatings === 'number' ? data.totalRatings : 0
+          }
         })
-      } else if (this.sortBy === 'Most Reviewed') {
-        filtered = filtered.sort((a, b) => {
-          const countA = a.totalRatings || 0
-          const countB = b.totalRatings || 0
-          return countB - countA
-        })
+      } catch (err) {
+        console.error('Failed to load recipes from Firestore:', err)
       }
-      
+    })
+
+    const filteredRecipes = computed(() => {
+      let filtered = [...recipes.value]
+
+      if (selectedCategory.value) {
+        filtered = filtered.filter(r => r.category === selectedCategory.value)
+      }
+      if (maxCookingTime.value) {
+        filtered = filtered.filter(r => r.cookingTime <= parseInt(maxCookingTime.value))
+      }
+      if (selectedDifficulty.value) {
+        filtered = filtered.filter(r => r.difficulty === selectedDifficulty.value)
+      }
+
+      if (sortBy.value === 'Rating: High to Low') {
+        filtered = filtered.sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
+      } else if (sortBy.value === 'Most Reviewed') {
+        filtered = filtered.sort((a, b) => (b.totalRatings || 0) - (a.totalRatings || 0))
+      }
       return filtered
-    },
-    hasActiveFilters() {
-      return this.selectedCategory || this.maxCookingTime || this.selectedDifficulty
+    })
+
+    const hasActiveFilters = computed(() => selectedCategory.value || maxCookingTime.value || selectedDifficulty.value)
+
+    function clearFilters() {
+      selectedCategory.value = ''
+      maxCookingTime.value = ''
+      selectedDifficulty.value = ''
     }
-  },
-  methods: {
-    clearFilters() {
-      this.selectedCategory = ''
-      this.maxCookingTime = ''
-      this.selectedDifficulty = ''
+
+    return {
+      recipes,
+      selectedCategory,
+      maxCookingTime,
+      selectedDifficulty,
+      sortBy,
+      filteredRecipes,
+      hasActiveFilters,
+      clearFilters
     }
   }
 }

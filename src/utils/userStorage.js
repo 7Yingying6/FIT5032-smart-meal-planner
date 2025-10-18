@@ -123,7 +123,7 @@ class UserStorage {
   saveCurrentUser(user, rememberMe = false) {
     try {
       const now = Date.now();
-      const expiresMs = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // 30 days with "remember me"; otherwise 24 hours
+      const expiresMs = rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // 7 days with "remember me"; otherwise 24 hours
       const sessionData = {
         user: { ...user, password: undefined },
         loginTime: new Date(now).toISOString(),
