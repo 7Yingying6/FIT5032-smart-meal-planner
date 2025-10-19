@@ -1,7 +1,7 @@
 // Firebase configuration used by the app
 
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -20,7 +20,13 @@ for (const [key, value] of Object.entries(firebaseConfig)) {
 }
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = initializeFirestore(app, {
+  // Enable auto detection of long polling in dev environments
+  experimentalAutoDetectLongPolling: true,
+  // useFetchStreams should be false to avoid stream issues under certain proxies
+  useFetchStreams: false,
+  ignoreUndefinedProperties: true,
+});
 
 export { db };
 export default app;

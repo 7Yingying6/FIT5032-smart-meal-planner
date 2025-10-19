@@ -37,11 +37,9 @@
                     class="form-select"
                   >
                     <option value="">All Categories</option>
-                    <option value="Healthy">Healthy</option>
-                    <option value="Comfort Food">Comfort Food</option>
                     <option value="Asian">Asian</option>
-                    <option value="Mexican">Mexican</option>
-                    <option value="Seafood">Seafood</option>
+                    <option value="Western">Western</option>
+                    <option value="Breakfast">Breakfast</option>
                     <option value="Dessert">Dessert</option>
                   </select>
                 </div>
@@ -54,8 +52,8 @@
                   >
                     <option value="">Any Time</option>
                     <option value="15">&lt;= 15 minutes</option>
+                    <option value="25">&lt;= 25 minutes</option>
                     <option value="30">&lt;= 30 minutes</option>
-                    <option value="45">&lt;= 45 minutes</option>
                   </select>
                 </div>
                 <div class="col-md-3">
@@ -136,6 +134,7 @@ import { getRecipeRatings } from '@/utils/ratingStorage'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
 import { ref, onMounted, computed } from 'vue'
+import localRecipes from '@/recipes.json'
 
 export default {
   name: 'Recipes',
@@ -152,7 +151,7 @@ export default {
     onMounted(async () => {
       try {
         const snapshot = await getDocs(collection(db, 'recipes'))
-        recipes.value = snapshot.docs.map(doc => {
+        const fromDb = snapshot.docs.map(doc => {
           const data = doc.data() || {}
           return {
             id: data.id != null ? data.id : doc.id,
@@ -162,15 +161,48 @@ export default {
             category: data.category || 'General',
             cookingTime: data.cookingTime || 0,
             difficulty: data.difficulty || 'Easy',
-            servings: data.servings || 1,
+            // servings removed from UI; keep optional for data compatibility
+            servings: data.servings,
             calories: data.calories || 0,
             tags: Array.isArray(data.tags) ? data.tags : [],
-            averageRating: typeof data.averageRating === 'number' ? data.averageRating : 0,
-            totalRatings: typeof data.totalRatings === 'number' ? data.totalRatings : 0
+            averageRating: typeof data.averageRating === 'number' ? data.averageRating : (getRecipeRatings(data.id || doc.id)?.averageRating || 0),
+            totalRatings: typeof data.totalRatings === 'number' ? data.totalRatings : (getRecipeRatings(data.id || doc.id)?.totalRatings || 0)
           }
         })
+        if (fromDb.length > 0) {
+          recipes.value = fromDb
+        } else {
+          recipes.value = localRecipes.map(r => ({
+            id: r.id != null ? r.id : String(r.title || r.name || Math.random()),
+            title: r.title || r.name || 'Untitled Recipe',
+            description: r.description || '',
+            image: r.image || '',
+            category: r.category || 'General',
+            cookingTime: r.cookingTime || 0,
+            difficulty: r.difficulty || 'Easy',
+            servings: r.servings,
+            calories: r.calories || 0,
+            tags: Array.isArray(r.tags) ? r.tags : [],
+            averageRating: getRecipeRatings(r.id)?.averageRating || 0,
+            totalRatings: getRecipeRatings(r.id)?.totalRatings || 0
+          }))
+        }
       } catch (err) {
         console.error('Failed to load recipes from Firestore:', err)
+        recipes.value = localRecipes.map(r => ({
+          id: r.id != null ? r.id : String(r.title || r.name || Math.random()),
+          title: r.title || r.name || 'Untitled Recipe',
+          description: r.description || '',
+          image: r.image || '',
+          category: r.category || 'General',
+          cookingTime: r.cookingTime || 0,
+          difficulty: r.difficulty || 'Easy',
+          servings: r.servings,
+          calories: r.calories || 0,
+          tags: Array.isArray(r.tags) ? r.tags : [],
+          averageRating: getRecipeRatings(r.id)?.averageRating || 0,
+          totalRatings: getRecipeRatings(r.id)?.totalRatings || 0
+        }))
       }
     })
 

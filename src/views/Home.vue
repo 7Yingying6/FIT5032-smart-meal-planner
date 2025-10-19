@@ -109,9 +109,13 @@
             <div class="recipe-card h-100 shadow-sm" @click="goToRecipe(recipe.id)">
               <div class="recipe-image-container">
                 <img 
-                  :src="recipe.image" 
+                  :src="getImageSrc(recipe.image, recipe.title)"
                   :alt="recipe.title"
                   class="recipe-image"
+                  loading="lazy"
+                  referrerpolicy="no-referrer"
+                  crossorigin="anonymous"
+                  @error="onImgError"
                 >
                 <div class="recipe-badge">
                   <span class="badge bg-warning text-dark">
@@ -184,6 +188,40 @@ import FeatureCard from '@/components/FeatureCard.vue'
 import recipesData from '@/data/recipes.json'
 import { getRecipeRatings } from '@/utils/ratingStorage'
 
+// Module-level local image map to avoid this-context issues
+const LOCAL_IMAGE_MAP = Object.freeze({
+  'Avocado Egg Toast': '/images/Avocado Egg Toast.jpg',
+  'Banana Pancakes': '/images/Banana Pancakes.jpg',
+  'Beef Gyudon Rice Bowl': '/images/Beef Gyudon Rice Bowl.webp',
+  'Beef Steak with Garlic Butter': '/images/Beef Steak with Garlic Butter.jpg',
+  'Berry Overnight Oats': '/images/Berry Overnight Oats.jpg',
+  'Chicken Alfredo Pasta': '/images/Chicken Alfredo Pasta.jpg',
+  'Chocolate Mousse': '/images/Chocolate Mousse.jpg',
+  'Chocolate Mug Cake': '/images/Chocolate Mug Cake.jpg',
+  'Creamy Mushroom Toast': '/images/Creamy Mushroom Toast.jpg',
+  'Garlic Butter Shrimp Noodles': '/images/Garlic Butter Shrimp Noodles.jpg.png',
+  'Grilled Salmon with Asparagus': '/images/Grilled Salmon with Asparagus.jpg',
+  'Ham & Cheese Sandwich': '/images/Ham & Cheese Sandwich.jpg',
+  'Instant Ramen Upgrade': '/images/Instant Ramen Upgrade.jpg',
+  'Japanese Curry Rice': '/images/Japanese Curry Rice.jpg',
+  'Kimchi Fried Rice': '/images/Kimchi Fried Rice.jpeg',
+  'Mango Pudding': '/images/Mango Pudding.jpeg',
+  'Matcha Cheesecake': '/images/Matcha Cheesecake.webp',
+  'Roasted Chicken Drumsticks': '/images/Roasted Chicken Drumsticks.png.webp',
+  'Scrambled Eggs with Tomato': '/images/Scrambled Eggs with Tomato.jpg',
+  'Shrimp Fried Rice': '/images/Shrimp Fried Rice.jpg',
+  'Sichuan Mala Hotpot Bowl': '/images/Sichuan Mala Hotpot Bowl.jpg',
+  'Spaghetti Bolognese': '/images/Spaghetti Bolognese.jpg',
+  'Stir-fried udon noodles': '/images/Stir-fried udon noodles.jpg',
+  'Teriyaki Chicken Rice Bowl': '/images/Teriyaki Chicken Rice Bowl.jpg',
+  'Tiramisu Cup': '/images/Tiramisu Cup.jpg',
+  'Tuna Sandwich': '/images/Tuna Sandwich.jpg.webp',
+  'Vegetable Cheese Omelette': '/images/Vegetable Cheese Omelette.jpg',
+  'Vegetable Egg Wrap': '/images/Vegetable Egg Wrap.jpg',
+  'Vegetable Stir-Fry Bowl': '/images/Vegetable Stir-Fry Bowl.jpg',
+  'Yogurt Parfait Cup': '/images/Yogurt Parfait Cup.jpg'
+})
+
 export default {
   name: 'Home',
   components: {
@@ -231,6 +269,42 @@ export default {
     },
     goToRecipe(recipeId) {
       this.$router.push(`/recipe/${recipeId}`)
+    },
+    getImageSrc(url, title) {
+      if (title && LOCAL_IMAGE_MAP[title]) return LOCAL_IMAGE_MAP[title]
+      if (!url) return this.getDefaultSvg()
+      if (typeof url === 'string' && url.startsWith('/images/')) return url
+      if (typeof url === 'string' && /\.(jpg|jpeg|png|webp)$/i.test(url) && !/^https?:\/\//i.test(url)) {
+        return `/images/${url}`
+      }
+      try {
+        const u = new URL(url)
+        if (u.hostname.includes('images.unsplash.com')) {
+          if (!u.searchParams.has('auto')) u.searchParams.set('auto', 'format')
+          if (!u.searchParams.has('fit')) u.searchParams.set('fit', 'crop')
+          if (!u.searchParams.has('w')) u.searchParams.set('w', '1000')
+          if (!u.searchParams.has('q')) u.searchParams.set('q', '60')
+          return u.toString()
+        }
+        return url
+      } catch (e) {
+        return url
+      }
+    },
+    onImgError(e) {
+      e.target.src = this.getDefaultSvg()
+      e.target.classList.add('image-fallback')
+    },
+    getDefaultSvg() {
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1000' height='600' viewBox='0 0 1000 600'>
+        <rect width='1000' height='600' fill='#f0f0f0'/>
+        <g fill='#bbb'>
+          <circle cx='500' cy='260' r='90'/>
+          <rect x='400' y='360' width='200' height='24' rx='12'/>
+        </g>
+        <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='22' fill='#888'>Image unavailable</text>
+      </svg>`
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
     }
   }
 }

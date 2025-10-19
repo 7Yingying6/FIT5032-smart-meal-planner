@@ -23,9 +23,13 @@
         <div class="col-lg-6">
           <div class="recipe-image-container">
             <img 
-              :src="recipe.image" 
+              :src="getImageSrc(recipe.image, recipe.title)" 
               :alt="recipe.title"
-              class="img-fluid rounded shadow recipe-main-image"
+              class="recipe-main-image"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+              crossorigin="anonymous"
+              @error="onImgError"
             >
             <div class="image-overlay">
               <span class="badge bg-primary fs-6">{{ recipe.category }}</span>
@@ -39,13 +43,15 @@
             
             <!-- Recipe Stats -->
             <div class="row g-3 mb-4">
-              <div class="col-6 col-md-3">
+              <div class="col-6 col-md-4">
                 <div class="stat-card text-center p-3 bg-light rounded">
                   <Icon icon="mdi:clock-outline" class="text-primary fs-4 mb-2" />
                   <div class="fw-bold">{{ recipe.cookingTime }} min</div>
                   <small class="text-muted">Cook Time</small>
                 </div>
               </div>
+              <!-- Removed Servings card -->
+              <!--
               <div class="col-6 col-md-3">
                 <div class="stat-card text-center p-3 bg-light rounded">
                   <Icon icon="mdi:account-group" class="text-info fs-4 mb-2" />
@@ -53,14 +59,15 @@
                   <small class="text-muted">Servings</small>
                 </div>
               </div>
-              <div class="col-6 col-md-3">
+              -->
+              <div class="col-6 col-md-4">
                 <div class="stat-card text-center p-3 bg-light rounded">
                   <Icon icon="mdi:fire" class="text-danger fs-4 mb-2" />
                   <div class="fw-bold">{{ recipe.calories }}</div>
                   <small class="text-muted">Calories</small>
                 </div>
               </div>
-              <div class="col-6 col-md-3">
+              <div class="col-6 col-md-4">
                 <div class="stat-card text-center p-3 bg-light rounded">
                   <Icon icon="mdi:chart-line" class="text-warning fs-4 mb-2" />
                   <div class="fw-bold">{{ recipe.difficulty }}</div>
@@ -350,6 +357,40 @@ import userStorage from '@/utils/userStorage'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '@/firebase'
 
+// Local image map at module scope to avoid this-context issues
+const LOCAL_IMAGE_MAP = Object.freeze({
+  'Avocado Egg Toast': '/images/Avocado Egg Toast.jpg',
+  'Banana Pancakes': '/images/Banana Pancakes.jpg',
+  'Beef Gyudon Rice Bowl': '/images/Beef Gyudon Rice Bowl.webp',
+  'Beef Steak with Garlic Butter': '/images/Beef Steak with Garlic Butter.jpg',
+  'Berry Overnight Oats': '/images/Berry Overnight Oats.jpg',
+  'Chicken Alfredo Pasta': '/images/Chicken Alfredo Pasta.jpg',
+  'Chocolate Mousse': '/images/Chocolate Mousse.jpg',
+  'Chocolate Mug Cake': '/images/Chocolate Mug Cake.jpg',
+  'Creamy Mushroom Toast': '/images/Creamy Mushroom Toast.jpg',
+  'Garlic Butter Shrimp Noodles': '/images/Garlic Butter Shrimp Noodles.jpg.png',
+  'Grilled Salmon with Asparagus': '/images/Grilled Salmon with Asparagus.jpg',
+  'Ham & Cheese Sandwich': '/images/Ham & Cheese Sandwich.jpg',
+  'Instant Ramen Upgrade': '/images/Instant Ramen Upgrade.jpg',
+  'Japanese Curry Rice': '/images/Japanese Curry Rice.jpg',
+  'Kimchi Fried Rice': '/images/Kimchi Fried Rice.jpeg',
+  'Mango Pudding': '/images/Mango Pudding.jpeg',
+  'Matcha Cheesecake': '/images/Matcha Cheesecake.webp',
+  'Roasted Chicken Drumsticks': '/images/Roasted Chicken Drumsticks.png.webp',
+  'Scrambled Eggs with Tomato': '/images/Scrambled Eggs with Tomato.jpg',
+  'Shrimp Fried Rice': '/images/Shrimp Fried Rice.jpg',
+  'Sichuan Mala Hotpot Bowl': '/images/Sichuan Mala Hotpot Bowl.jpg',
+  'Spaghetti Bolognese': '/images/Spaghetti Bolognese.jpg',
+  'Stir-fried udon noodles': '/images/Stir-fried udon noodles.jpg',
+  'Teriyaki Chicken Rice Bowl': '/images/Teriyaki Chicken Rice Bowl.jpg',
+  'Tiramisu Cup': '/images/Tiramisu Cup.jpg',
+  'Tuna Sandwich': '/images/Tuna Sandwich.jpg.webp',
+  'Vegetable Cheese Omelette': '/images/Vegetable Cheese Omelette.jpg',
+  'Vegetable Egg Wrap': '/images/Vegetable Egg Wrap.jpg',
+  'Vegetable Stir-Fry Bowl': '/images/Vegetable Stir-Fry Bowl.jpg',
+  'Yogurt Parfait Cup': '/images/Yogurt Parfait Cup.jpg'
+})
+
 export default {
   name: 'RecipeDetail',
   components: {
@@ -406,7 +447,8 @@ export default {
             category: data.category || 'General',
             cookingTime: data.cookingTime || 0,
             difficulty: data.difficulty || 'Easy',
-            servings: data.servings || 1,
+            // servings removed from UI; keep optional for data compatibility
+            servings: data.servings,
             calories: data.calories || 0,
             tags: Array.isArray(data.tags) ? data.tags : [],
             ingredients: Array.isArray(data.ingredients) ? data.ingredients : [],
@@ -464,6 +506,42 @@ export default {
     },
     showMessage(message, type = 'info') {
       console.log(`${type.toUpperCase()}: ${message}`)
+    },
+    getImageSrc(url, title) {
+      if (title && LOCAL_IMAGE_MAP[title]) return LOCAL_IMAGE_MAP[title]
+      if (!url) return this.getDefaultSvg()
+      if (typeof url === 'string' && url.startsWith('/images/')) return url
+      if (typeof url === 'string' && /\.(jpg|jpeg|png|webp)$/i.test(url) && !/^https?:\/\//i.test(url)) {
+        return `/images/${url}`
+      }
+      try {
+        const u = new URL(url)
+        if (u.hostname.includes('images.unsplash.com')) {
+          if (!u.searchParams.has('auto')) u.searchParams.set('auto', 'format')
+          if (!u.searchParams.has('fit')) u.searchParams.set('fit', 'crop')
+          if (!u.searchParams.has('w')) u.searchParams.set('w', '1200')
+          if (!u.searchParams.has('q')) u.searchParams.set('q', '60')
+          return u.toString()
+        }
+        return url
+      } catch (e) {
+        return url
+      }
+    },
+    onImgError(e) {
+      e.target.src = this.getDefaultSvg()
+      e.target.classList.add('image-fallback')
+    },
+    getDefaultSvg() {
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'>
+        <rect width='1200' height='675' fill='#f0f0f0'/>
+        <g fill='#bbb'>
+          <circle cx='600' cy='300' r='110'/>
+          <rect x='500' y='430' width='200' height='26' rx='13'/>
+        </g>
+        <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='24' fill='#888'>Image unavailable</text>
+      </svg>`
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
     }
   },
   watch: {

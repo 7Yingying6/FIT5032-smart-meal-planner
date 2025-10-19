@@ -1,0 +1,68 @@
+// src/addMissingFields.js
+// This script checks each recipe in Firestore and adds "ingredients" and "instructions"
+// ONLY if they are missing.
+
+import { initializeApp } from "firebase/app";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
+
+//  Your Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCfYI7286H51B6M68XgWAVCpl-5MXy2h4M",
+  authDomain: "week7-yingying-ren.firebaseapp.com",
+  projectId: "week7-yingying-ren",
+  storageBucket: "week7-yingying-ren.firebasestorage.app",
+  messagingSenderId: "783966259650",
+  appId: "1:783966259650:web:4b049561e5d36284cb2e5b",
+  measurementId: "G-1G1EN5MRLQ",
+};
+
+//  Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function addMissingFields() {
+  const querySnapshot = await getDocs(collection(db, "recipes"));
+  let updatedCount = 0;
+
+  for (const d of querySnapshot.docs) {
+    const data = d.data();
+    const updates = {};
+
+    // only add ingredients if missing or empty
+    if (!data.ingredients || data.ingredients.length === 0) {
+      updates.ingredients = [
+        "1 tbsp olive oil",
+        "200g main ingredient",
+        "Salt and pepper to taste",
+        "Optional garnish",
+      ];
+    }
+
+    // only add instructions if missing or empty
+    if (!data.instructions || data.instructions.length === 0) {
+      updates.instructions = [
+        "Prepare all ingredients.",
+        "Heat oil in pan.",
+        "Cook main ingredient until done.",
+        "Season and serve.",
+      ];
+    }
+
+    // Update only if something is missing
+    if (Object.keys(updates).length > 0) {
+      await updateDoc(doc(db, "recipes", d.id), updates);
+      updatedCount++;
+      console.log(` Updated: ${data.name}`);
+    }
+  }
+
+  console.log(` Completed! ${updatedCount} recipe(s) were missing details and updated.`);
+}
+
+addMissingFields();

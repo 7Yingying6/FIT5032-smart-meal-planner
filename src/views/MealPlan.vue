@@ -31,27 +31,29 @@
           <div class="card shadow-sm">
             <div class="card-body">
               <div class="row text-center">
-                <div class="col-6 col-md-3">
+                <div class="col-6 col-md-4">
                   <div class="summary-stat">
                     <Icon icon="mdi:silverware-fork-knife" class="text-success fs-2 mb-2" />
                     <h4 class="mb-1">{{ mealPlan.length }}</h4>
                     <small class="text-muted">Meals Planned</small>
                   </div>
                 </div>
-                <div class="col-6 col-md-3">
+                <div class="col-6 col-md-4">
                   <div class="summary-stat">
                     <Icon icon="mdi:clock-outline" class="text-primary fs-2 mb-2" />
                     <h4 class="mb-1">{{ totalCookingTime }} min</h4>
                     <small class="text-muted">Total Cook Time</small>
                   </div>
                 </div>
-                <div class="col-6 col-md-3">
+                <div class="col-6 col-md-4">
                   <div class="summary-stat">
                     <Icon icon="mdi:fire" class="text-danger fs-2 mb-2" />
                     <h4 class="mb-1">{{ totalCalories }}</h4>
                     <small class="text-muted">Total Calories</small>
                   </div>
                 </div>
+                <!-- Removed Avg Servings summary stat -->
+                <!--
                 <div class="col-6 col-md-3">
                   <div class="summary-stat">
                     <Icon icon="mdi:account-group" class="text-warning fs-2 mb-2" />
@@ -59,6 +61,7 @@
                     <small class="text-muted">Avg Servings</small>
                   </div>
                 </div>
+                -->
               </div>
             </div>
           </div>
@@ -101,19 +104,22 @@
               <!-- Meal Stats -->
               <div class="meal-stats mb-3">
                 <div class="row text-center">
+                  <!-- Removed servings per meal -->
+                  <!--
                   <div class="col-4">
                     <small class="text-muted">
                       <Icon icon="mdi:account-group" /><br>
                       {{ meal.servings }}
                     </small>
                   </div>
-                  <div class="col-4">
+                  -->
+                  <div class="col-6">
                     <small class="text-muted">
                       <Icon icon="mdi:fire" /><br>
                       {{ meal.calories }}
                     </small>
                   </div>
-                  <div class="col-4">
+                  <div class="col-6">
                     <small class="text-muted">
                       <Icon icon="mdi:chart-line" /><br>
                       {{ meal.difficulty }}
@@ -396,7 +402,7 @@ export default {
         Day: this.getDayName(index),
         Title: meal.title,
         Category: meal.category,
-        Servings: meal.servings,
+        // Servings removed
         Calories: meal.calories,
         CookingTime: meal.cookingTime + ' min',
         Ingredients: (meal.ingredients || []).join(', ')
@@ -450,10 +456,10 @@ export default {
       doc.setFontSize(16)
       doc.text('Weekly Meal Plan', 14, 18)
       const rows = this.buildWeekPlanData().map(r => [
-        r.Day, r.Title, r.Category, r.Servings, r.Calories, r.CookingTime
+        r.Day, r.Title, r.Category, r.Calories, r.CookingTime
       ])
       autoTable(doc, {
-        head: [["Day", "Title", "Category", "Servings", "Calories", "Cook Time"]],
+        head: [["Day", "Title", "Category", "Calories", "Cook Time"]],
         body: rows,
         startY: 24,
         styles: { fontSize: 10 }
