@@ -28,7 +28,6 @@
               class="recipe-main-image"
               loading="lazy"
               referrerpolicy="no-referrer"
-              crossorigin="anonymous"
               @error="onImgError"
             >
             <div class="image-overlay">
@@ -395,6 +394,7 @@ import userStorage from '@/utils/userStorage'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '@/firebase'
 import localRecipes from '@/recipes.json'
+import detailedRecipes from '@/data/recipes.json'
 
 // Local image map at module scope to avoid this-context issues
 const LOCAL_IMAGE_MAP = Object.freeze({
@@ -404,6 +404,7 @@ const LOCAL_IMAGE_MAP = Object.freeze({
   'Beef Steak with Garlic Butter': '/images/Beef Steak with Garlic Butter.jpg',
   'Berry Overnight Oats': '/images/Berry Overnight Oats.jpg',
   'Chicken Alfredo Pasta': '/images/Chicken Alfredo Pasta.jpg',
+  'Creamy Chicken Alfredo Pasta': '/images/Chicken Alfredo Pasta.jpg',
   'Chocolate Mousse': '/images/Chocolate Mousse.jpg',
   'Chocolate Mug Cake': '/images/Chocolate Mug Cake.jpg',
   'Creamy Mushroom Toast': '/images/Creamy Mushroom Toast.jpg',
@@ -486,31 +487,31 @@ export default {
       try {
         // Early fallback in dev or when Firestore is not initialized
         if (!db) {
-          const routeId = Number(this.$route.params.id)
-          const localMatch = localRecipes.find(r => Number(r.id) === routeId)
-          if (localMatch) {
-            this.recipes = [
-              {
-                id: localMatch.id != null ? localMatch.id : String(localMatch.title || localMatch.name || Math.random()),
-                title: localMatch.title || localMatch.name || 'Untitled Recipe',
-                description: localMatch.description || '',
-                image: localMatch.image || '',
-                category: localMatch.category || 'General',
-                cookingTime: Number(localMatch.cookingTime) || 0,
-                difficulty: localMatch.difficulty || 'Easy',
-                servings: localMatch.servings,
-                calories: Number(localMatch.calories) || 0,
-                tags: Array.isArray(localMatch.tags) ? localMatch.tags : [],
-                ingredients: Array.isArray(localMatch.ingredients) ? localMatch.ingredients : [],
-                instructions: Array.isArray(localMatch.instructions) ? localMatch.instructions : [],
-                alternatives: localMatch.alternatives || null,
-                averageRating: typeof localMatch.averageRating === 'number' ? localMatch.averageRating : 0,
-                totalRatings: typeof localMatch.totalRatings === 'number' ? localMatch.totalRatings : 0
-              }
-            ]
-          } else {
-            this.recipes = Array.isArray(localRecipes) ? localRecipes : []
-          }
+          // Use merged fallback dataset to ensure Previous/Next navigation works when Firestore is unavailable
+          const baseArr = Array.isArray(localRecipes) ? localRecipes : []
+          const detailArr = Array.isArray(detailedRecipes) ? detailedRecipes : []
+          const detailMap = new Map(detailArr.map(r => [Number(r.id), r]))
+          this.recipes = baseArr.map(r => {
+            const d = detailMap.get(Number(r.id))
+            const src = d || r
+            return {
+              id: src.id != null ? src.id : String(src.title || src.name || Math.random()),
+              title: src.title || src.name || 'Untitled Recipe',
+              description: src.description || '',
+              image: src.image || '',
+              category: src.category || 'General',
+              cookingTime: Number(src.cookingTime) || 0,
+              difficulty: src.difficulty || 'Easy',
+              servings: src.servings,
+              calories: Number(src.calories) || 0,
+              tags: Array.isArray(src.tags) ? src.tags : [],
+              ingredients: Array.isArray(src.ingredients) ? src.ingredients : [],
+              instructions: Array.isArray(src.instructions) ? src.instructions : [],
+              alternatives: src.alternatives || null,
+              averageRating: typeof src.averageRating === 'number' ? src.averageRating : 0,
+              totalRatings: typeof src.totalRatings === 'number' ? src.totalRatings : 0
+            }
+          })
           return
         }
         const snapshot = await getDocs(collection(db, 'recipes'))
@@ -537,35 +538,87 @@ export default {
         })
         if (fromDb.length > 0) {
           this.recipes = fromDb
-          // If current route recipe not found in DB, fallback to local JSON for this id
+          // If current route recipe not found in DB, fallback to local/detailed JSON for this id
           const routeId = Number(this.$route.params.id)
           if (!this.recipes.find(r => Number(r.id) === routeId)) {
-            const localMatch = localRecipes.find(r => Number(r.id) === routeId)
-            if (localMatch) {
+            const detailedMatch = Array.isArray(detailedRecipes)
+              ? detailedRecipes.find(r => Number(r.id) === routeId)
+              : null
+            const localMatch = !detailedMatch && localRecipes.find(r => Number(r.id) === routeId)
+            const src = detailedMatch || localMatch
+            if (src) {
               this.recipes.push({
-                id: localMatch.id != null ? localMatch.id : String(localMatch.title || localMatch.name || Math.random()),
-                title: localMatch.title || localMatch.name || 'Untitled Recipe',
-                description: localMatch.description || '',
-                image: localMatch.image || '',
-                category: localMatch.category || 'General',
-                cookingTime: Number(localMatch.cookingTime) || 0,
-                difficulty: localMatch.difficulty || 'Easy',
-                servings: localMatch.servings,
-                calories: Number(localMatch.calories) || 0,
-                tags: Array.isArray(localMatch.tags) ? localMatch.tags : [],
-                ingredients: Array.isArray(localMatch.ingredients) ? localMatch.ingredients : [],
-                instructions: Array.isArray(localMatch.instructions) ? localMatch.instructions : [],
-                alternatives: localMatch.alternatives || null,
-                averageRating: typeof localMatch.averageRating === 'number' ? localMatch.averageRating : 0,
-                totalRatings: typeof localMatch.totalRatings === 'number' ? localMatch.totalRatings : 0
+                id: src.id != null ? src.id : String(src.title || src.name || Math.random()),
+                title: src.title || src.name || 'Untitled Recipe',
+                description: src.description || '',
+                image: src.image || '',
+                category: src.category || 'General',
+                cookingTime: Number(src.cookingTime) || 0,
+                difficulty: src.difficulty || 'Easy',
+                servings: src.servings,
+                calories: Number(src.calories) || 0,
+                tags: Array.isArray(src.tags) ? src.tags : [],
+                ingredients: Array.isArray(src.ingredients) ? src.ingredients : [],
+                instructions: Array.isArray(src.instructions) ? src.instructions : [],
+                alternatives: src.alternatives || null,
+                averageRating: typeof src.averageRating === 'number' ? src.averageRating : 0,
+                totalRatings: typeof src.totalRatings === 'number' ? src.totalRatings : 0
               })
             }
           }
         } else {
-          this.recipes = Array.isArray(localRecipes) ? localRecipes : []
+          // Merge local and detailed datasets as Firestore fallback
+          const baseArr = Array.isArray(localRecipes) ? localRecipes : []
+          const detailArr = Array.isArray(detailedRecipes) ? detailedRecipes : []
+          const detailMap = new Map(detailArr.map(r => [Number(r.id), r]))
+          this.recipes = baseArr.map(r => {
+            const d = detailMap.get(Number(r.id))
+            const src = d || r
+            return {
+              id: src.id != null ? src.id : String(src.title || src.name || Math.random()),
+              title: src.title || src.name || 'Untitled Recipe',
+              description: src.description || '',
+              image: src.image || '',
+              category: src.category || 'General',
+              cookingTime: Number(src.cookingTime) || 0,
+              difficulty: src.difficulty || 'Easy',
+              servings: src.servings,
+              calories: Number(src.calories) || 0,
+              tags: Array.isArray(src.tags) ? src.tags : [],
+              ingredients: Array.isArray(src.ingredients) ? src.ingredients : [],
+              instructions: Array.isArray(src.instructions) ? src.instructions : [],
+              alternatives: src.alternatives || null,
+              averageRating: typeof src.averageRating === 'number' ? src.averageRating : 0,
+              totalRatings: typeof src.totalRatings === 'number' ? src.totalRatings : 0
+            }
+          })
         }
       } catch (_) {
-        this.recipes = Array.isArray(localRecipes) ? localRecipes : []
+        // Final fallback: merge local and detailed datasets
+        const baseArr = Array.isArray(localRecipes) ? localRecipes : []
+        const detailArr = Array.isArray(detailedRecipes) ? detailedRecipes : []
+        const detailMap = new Map(detailArr.map(r => [Number(r.id), r]))
+        this.recipes = baseArr.map(r => {
+          const d = detailMap.get(Number(r.id))
+          const src = d || r
+          return {
+            id: src.id != null ? src.id : String(src.title || src.name || Math.random()),
+            title: src.title || src.name || 'Untitled Recipe',
+            description: src.description || '',
+            image: src.image || '',
+            category: src.category || 'General',
+            cookingTime: Number(src.cookingTime) || 0,
+            difficulty: src.difficulty || 'Easy',
+            servings: src.servings,
+            calories: Number(src.calories) || 0,
+            tags: Array.isArray(src.tags) ? src.tags : [],
+            ingredients: Array.isArray(src.ingredients) ? src.ingredients : [],
+            instructions: Array.isArray(src.instructions) ? src.instructions : [],
+            alternatives: src.alternatives || null,
+            averageRating: typeof src.averageRating === 'number' ? src.averageRating : 0,
+            totalRatings: typeof src.totalRatings === 'number' ? src.totalRatings : 0
+          }
+        })
       }
     },
     goToPreviousRecipe() {
