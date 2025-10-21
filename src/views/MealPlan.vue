@@ -11,14 +11,17 @@
             <p class="lead mb-0">Your personalized meal plan for the week</p>
           </div>
           <div class="col-md-4 text-md-end">
-            <button 
-              @click="generateNewPlan" 
-              class="btn btn-light btn-lg"
-              :disabled="isGenerating"
-            >
-              <Icon icon="mdi:sync" class="me-2" :class="{ 'icon-spin': isGenerating }" />
-              {{ isGenerating ? 'Generating...' : 'New Plan' }}
-            </button>
+            <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-stretch gap-2">
+              <button 
+                @click="generateNewPlan" 
+                class="btn btn-light btn-lg"
+                :disabled="isGenerating"
+              >
+                <Icon icon="mdi:sync" class="me-2" :class="{ 'icon-spin': isGenerating }" />
+                {{ isGenerating ? 'Generating...' : 'New Plan' }}
+              </button>
+              <!-- EmailSender moved to bottom -->
+            </div>
           </div>
         </div>
       </div>
@@ -273,6 +276,12 @@
           </div>
         </div>
       </div>
+      <!-- Email Sender at page bottom -->
+      <div class="row mt-5 mb-5">
+        <div class="col-12 d-flex justify-content-center">
+          <EmailSender :user="user" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -283,11 +292,13 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import Papa from 'papaparse'
 import InteractiveShoppingTable from '@/components/InteractiveShoppingTable.vue'
+import EmailSender from '@/components/EmailSender.vue'
 
 export default {
   name: 'MealPlan',
   components: {
-    InteractiveShoppingTable
+    InteractiveShoppingTable,
+    EmailSender
   },
   data() {
     return {
@@ -297,7 +308,9 @@ export default {
       isReplacing: null,
       showShoppingList: false,
       showExportOptions: false,
-      dayNames: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+      dayNames: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      estimatedBudget: '$0.00',
+      user: null
     }
   },
   computed: {

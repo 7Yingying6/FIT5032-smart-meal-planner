@@ -13,13 +13,13 @@ import {
 
 //  Your Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCfYI7286H51B6M68XgWAVCpl-5MXy2h4M",
-  authDomain: "week7-yingying-ren.firebaseapp.com",
-  projectId: "week7-yingying-ren",
-  storageBucket: "week7-yingying-ren.firebasestorage.app",
-  messagingSenderId: "783966259650",
-  appId: "1:783966259650:web:4b049561e5d36284cb2e5b",
-  measurementId: "G-1G1EN5MRLQ",
+  apiKey: process.env.VITE_FIREBASE_API_KEY || "AIzaSyCfYI7286H51B6M68XgWAVCpl-5MXy2h4M",
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || "week7-yingying-ren.firebaseapp.com",
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID || "week7-yingying-ren",
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || "week7-yingying-ren.firebasestorage.app",
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "783966259650",
+  appId: process.env.VITE_FIREBASE_APP_ID || "1:783966259650:web:4b049561e5d36284cb2e5b",
+  measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID || "G-1G1EN5MRLQ",
 };
 
 //  Initialize Firebase

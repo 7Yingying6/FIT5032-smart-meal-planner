@@ -13,20 +13,30 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-for (const [key, value] of Object.entries(firebaseConfig)) {
-  if (!value) {
-    console.error(`Missing Firebase env: ${key}`);
-  }
+const missingKeys = Object.entries(firebaseConfig)
+  .filter(([key, value]) => !value)
+  .map(([key]) => key)
+
+if (missingKeys.length && import.meta.env.DEV) {
+  console.debug(`Missing Firebase env keys: ${missingKeys.join(', ')}`)
 }
 
-const app = initializeApp(firebaseConfig);
-const db = initializeFirestore(app, {
-  // Enable auto detection of long polling in dev environments
-  experimentalAutoDetectLongPolling: true,
+// Flag to indicate whether Firebase config is valid
+const hasValidConfig = missingKeys.length === 0
+
+// Initialize app only when config is valid
+const app = hasValidConfig ? initializeApp(firebaseConfig) : null
+
+// Initialize Firestore only in production with valid config
+const db = hasValidConfig && import.meta.env.PROD ? initializeFirestore(app, {
+  // Force long polling to avoid Listen/channel aborts in certain dev environments
+  experimentalForceLongPolling: true,
+  // Prefer REST transport to avoid streaming Listen/channel requests in dev
+  preferRest: true,
   // useFetchStreams should be false to avoid stream issues under certain proxies
   useFetchStreams: false,
   ignoreUndefinedProperties: true,
-});
+}) : null
 
-export { db };
-export default app;
+export { db, hasValidConfig }
+export default app

@@ -132,12 +132,13 @@ export default {
   computed: {
     canDeleteRating() {
       if (!this.existingRating) return false
-      
       const user = userStorage.getCurrentUser()
       if (!user) return false
-      
-      // Users can only delete their own ratings
-      return this.existingRating.userId === user.id
+      if (this.existingRating.userId === user.id) return true
+      const roles = Array.isArray(user.roles) ? user.roles : []
+      const roleStr = user.role || ''
+      // Privileged roles can delete any rating
+      return roleStr === 'administrator' || roleStr === 'nutritionist' || roles.includes('administrator') || roles.includes('nutritionist')
     }
   },
   mounted() {
@@ -273,32 +274,26 @@ export default {
       // Clear previous messages
       this.errorMessage = ''
       this.successMessage = ''
-      
       const user = userStorage.getCurrentUser()
       if (!user) {
         this.$router.push('/auth')
         return
       }
-      
-      if (!confirm('Are you sure you want to remove your rating?')) {
+      if (!confirm('Are you sure you want to remove this rating?')) {
         return
       }
-      
       this.isSubmitting = true
-      
       try {
-        const success = removeUserRating(this.recipeId, user.id)
-        
+        const roles = Array.isArray(user.roles) ? user.roles : []
+        const roleStr = user.role || ''
+        const isPrivileged = roleStr === 'administrator' || roleStr === 'nutritionist' || roles.includes('administrator') || roles.includes('nutritionist')
+        const targetUserId = isPrivileged && this.existingRating ? this.existingRating.userId : user.id
+        const success = removeUserRating(this.recipeId, targetUserId, isPrivileged)
         if (success) {
           this.currentRating = 0
           this.comment = ''
           this.existingRating = null
-          
-          this.$emit('rating-updated', {
-            recipeId: this.recipeId,
-            removed: true
-          })
-          
+          this.$emit('rating-updated', { recipeId: this.recipeId, removed: true })
           this.showSuccessMessage('Rating removed successfully!')
         } else {
           this.errorMessage = 'Failed to remove rating. Please try again.'
@@ -360,13 +355,13 @@ export default {
 }
 
 .btn-primary {
-  background-color: #198754;
-  border-color: #198754;
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
 }
 
 .btn-primary:hover {
-  background-color: #157347;
-  border-color: #146c43;
+  background-color: #1ea34c;
+  border-color: #1ea34c;
 }
 
 .spinner-border-sm {

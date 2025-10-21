@@ -1,9 +1,9 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark" :style="{ backgroundColor: '#064e3b' }">
+  <nav class="navbar navbar-expand-lg navbar-dark" :style="{ backgroundColor: '#064e3b' }" role="navigation" aria-label="Main navigation">
     <div class="container">
       <router-link class="navbar-brand" to="/">
         <Icon icon="mdi:silverware-fork-knife" class="me-2" />
-        Smart Meal Planner
+        NutriPlanner
       </router-link>
       
       <button 
@@ -33,6 +33,16 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/meal-plan" active-class="active">
               <Icon icon="mdi:calendar-week" class="me-1" />Meal Plan
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/shopping" active-class="active">
+              <Icon icon="mdi:cart-outline" class="me-1" />Lets Go Shopping
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/disclaimer" active-class="active">
+              <Icon icon="mdi:information-outline" class="me-1" />Disclaimer
             </router-link>
           </li>
           

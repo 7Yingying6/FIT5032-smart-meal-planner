@@ -2,7 +2,7 @@
 
 ## Image Sources and Copyright Information
 
-This document contains attribution information for all images and visual assets used in the Smart Meal Planner application, in compliance with copyright requirements and best practices.
+This document contains attribution information for all images and visual assets used in the NutriPlanner application, in compliance with copyright requirements and best practices.
 
 ### Recipe Images
 
@@ -105,13 +105,13 @@ All recipe images used in this application are sourced from Unsplash, a platform
 
 #### Recipe Data
 - **Source**: Original content created for demonstration purposes
-- **Author**: FIT5032 Smart Meal Planner Development Team
+- **Author**: FIT5032 NutriPlanner Development Team
 - **License**: Educational use only
 - **Usage**: Sample recipe data including ingredients, instructions, and nutritional information
 
 #### User Interface Text
 - **Source**: Original content
-- **Author**: FIT5032 Smart Meal Planner Development Team
+- **Author**: FIT5032 NutriPlanner Development Team
 - **License**: Educational use only
 - **Usage**: Application copy, descriptions, and user interface text
 
@@ -159,4 +159,4 @@ For any questions regarding the use of copyrighted material in this application,
 
 **Last Updated**: January 2025
 **Application Version**: 1.0.0
-**Assignment**: FIT5032 A1.2 - Smart Meal Planner Implementation
+**Assignment**: FIT5032 A1.2 - NutriPlanner Implementation

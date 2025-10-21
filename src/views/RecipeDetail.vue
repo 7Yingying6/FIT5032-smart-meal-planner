@@ -263,6 +263,44 @@
                   <div v-if="review.comment" class="review-comment">
                     <p class="mb-0">{{ review.comment }}</p>
                   </div>
+                  <!-- Replies list -->
+                  <div v-if="Array.isArray(review.replies) && review.replies.length" class="review-replies mt-2">
+                    <div 
+                      v-for="(reply, idx) in review.replies" 
+                      :key="reply.userId + reply.timestamp + idx"
+                      class="reply-item p-2 ps-3 border-start border-3 border-info bg-light rounded mb-2"
+                    >
+                      <div class="d-flex align-items-center mb-1">
+                        <Icon icon="mdi:account-badge" class="text-info me-2" />
+                        <span class="fw-bold">{{ getReplyRoleLabel(reply.role) }}</span>
+                        <span class="text-muted small ms-2">{{ formatDate(reply.timestamp) }}</span>
+                      </div>
+                      <div class="text-dark">{{ reply.content }}</div>
+                    </div>
+                  </div>
+                  <!-- Nutritionist reply input -->
+                  <div v-if="isNutritionist" class="reply-form mt-2">
+                    <div class="input-group input-group-sm">
+                      <textarea 
+                        v-model="replyInputs[review.userId]"
+                        class="form-control"
+                        rows="2"
+                        :maxlength="200"
+                        placeholder="Reply to this user's comment as nutritionist"
+                      ></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                      <small class="text-muted">{{ (replyInputs[review.userId] || '').length }}/200</small>
+                      <button 
+                        class="btn btn-info btn-sm"
+                        :disabled="replySubmitting[review.userId]"
+                        @click="submitReply(review)"
+                      >
+                        <span v-if="replySubmitting[review.userId]" class="spinner-border spinner-border-sm me-1"></span>
+                        <Icon icon="mdi:comment-reply" class="me-1" />Submit Reply
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -351,11 +389,12 @@
 <script>
 // import recipesData from '@/data/recipes.json'
 import StarRating from '@/components/StarRating.vue'
-import { getRecipeRatings, getUserRating } from '@/utils/ratingStorage'
+import { getRecipeRatings, getUserRating, addReply } from '@/utils/ratingStorage'
 import userStorage from '@/utils/userStorage'
 // Firestore imports
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '@/firebase'
+import localRecipes from '@/recipes.json'
 
 // Local image map at module scope to avoid this-context issues
 const LOCAL_IMAGE_MAP = Object.freeze({
@@ -405,7 +444,9 @@ export default {
       },
       userReviews: [],
       currentUser: null,
-      myRating: null
+      myRating: null,
+      replyInputs: {},
+      replySubmitting: {}
     }
   },
   computed: {
@@ -424,6 +465,13 @@ export default {
     nextRecipe() {
       if (this.currentIndex >= this.recipes.length - 1) return null
       return this.recipes[this.currentIndex + 1]
+    },
+    isNutritionist() {
+      const u = this.currentUser || userStorage.getCurrentUser()
+      if (!u) return false
+      const roles = Array.isArray(u.roles) ? u.roles : []
+      const roleStr = u.role || ''
+      return roleStr === 'nutritionist' || roleStr === 'administrator' || roles.includes('nutritionist') || roles.includes('administrator')
     }
   },
   mounted() {
@@ -436,8 +484,37 @@ export default {
     // Load recipes from Firestore and normalize fields
     async loadRecipes() {
       try {
+        // Early fallback in dev or when Firestore is not initialized
+        if (!db) {
+          const routeId = Number(this.$route.params.id)
+          const localMatch = localRecipes.find(r => Number(r.id) === routeId)
+          if (localMatch) {
+            this.recipes = [
+              {
+                id: localMatch.id != null ? localMatch.id : String(localMatch.title || localMatch.name || Math.random()),
+                title: localMatch.title || localMatch.name || 'Untitled Recipe',
+                description: localMatch.description || '',
+                image: localMatch.image || '',
+                category: localMatch.category || 'General',
+                cookingTime: Number(localMatch.cookingTime) || 0,
+                difficulty: localMatch.difficulty || 'Easy',
+                servings: localMatch.servings,
+                calories: Number(localMatch.calories) || 0,
+                tags: Array.isArray(localMatch.tags) ? localMatch.tags : [],
+                ingredients: Array.isArray(localMatch.ingredients) ? localMatch.ingredients : [],
+                instructions: Array.isArray(localMatch.instructions) ? localMatch.instructions : [],
+                alternatives: localMatch.alternatives || null,
+                averageRating: typeof localMatch.averageRating === 'number' ? localMatch.averageRating : 0,
+                totalRatings: typeof localMatch.totalRatings === 'number' ? localMatch.totalRatings : 0
+              }
+            ]
+          } else {
+            this.recipes = Array.isArray(localRecipes) ? localRecipes : []
+          }
+          return
+        }
         const snapshot = await getDocs(collection(db, 'recipes'))
-        this.recipes = snapshot.docs.map(doc => {
+        const fromDb = snapshot.docs.map(doc => {
           const data = doc.data() || {}
           return {
             id: data.id != null ? data.id : doc.id,
@@ -458,8 +535,37 @@ export default {
             totalRatings: typeof data.totalRatings === 'number' ? data.totalRatings : 0
           }
         })
-      } catch (e) {
-        console.error('Failed to load recipes from Firestore', e)
+        if (fromDb.length > 0) {
+          this.recipes = fromDb
+          // If current route recipe not found in DB, fallback to local JSON for this id
+          const routeId = Number(this.$route.params.id)
+          if (!this.recipes.find(r => Number(r.id) === routeId)) {
+            const localMatch = localRecipes.find(r => Number(r.id) === routeId)
+            if (localMatch) {
+              this.recipes.push({
+                id: localMatch.id != null ? localMatch.id : String(localMatch.title || localMatch.name || Math.random()),
+                title: localMatch.title || localMatch.name || 'Untitled Recipe',
+                description: localMatch.description || '',
+                image: localMatch.image || '',
+                category: localMatch.category || 'General',
+                cookingTime: Number(localMatch.cookingTime) || 0,
+                difficulty: localMatch.difficulty || 'Easy',
+                servings: localMatch.servings,
+                calories: Number(localMatch.calories) || 0,
+                tags: Array.isArray(localMatch.tags) ? localMatch.tags : [],
+                ingredients: Array.isArray(localMatch.ingredients) ? localMatch.ingredients : [],
+                instructions: Array.isArray(localMatch.instructions) ? localMatch.instructions : [],
+                alternatives: localMatch.alternatives || null,
+                averageRating: typeof localMatch.averageRating === 'number' ? localMatch.averageRating : 0,
+                totalRatings: typeof localMatch.totalRatings === 'number' ? localMatch.totalRatings : 0
+              })
+            }
+          }
+        } else {
+          this.recipes = Array.isArray(localRecipes) ? localRecipes : []
+        }
+      } catch (_) {
+        this.recipes = Array.isArray(localRecipes) ? localRecipes : []
       }
     },
     goToPreviousRecipe() {
@@ -542,18 +648,50 @@ export default {
         <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='24' fill='#888'>Image unavailable</text>
       </svg>`
       return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
-    }
-  },
-  watch: {
-    '$route'() {
-      // Scroll to top when route changes
-      window.scrollTo(0, 0)
-      // Reload rating data for new recipe
-      this.loadRatingData()
     },
-    recipe() {
-      // Reload rating data when recipe changes
-      this.loadRatingData()
+    getReplyRoleLabel(role) {
+      const key = String(role || '').toLowerCase()
+      if (key === 'nutritionist') return 'nutritionist'
+      if (key === 'administrator') return 'administrator'
+      return 'staff'
+    },
+    async submitReply(review) {
+      try {
+        if (!this.isNutritionist) {
+          this.showMessage('Only nutritionists can reply.', 'warning')
+          return
+        }
+        this.currentUser = this.currentUser || userStorage.getCurrentUser()
+        if (!this.currentUser) {
+          this.showMessage('Please login to reply.', 'warning')
+          return
+        }
+        const targetUserId = review.userId
+        const text = String(this.replyInputs[targetUserId] || '').trim()
+        if (!text) {
+          this.showMessage('Reply content cannot be empty.', 'warning')
+          return
+        }
+        if (text.length > 200) {
+          this.showMessage('Reply is too long (max 200 characters).', 'warning')
+          return
+        }
+        this.$set ? this.$set(this.replySubmitting, targetUserId, true) : (this.replySubmitting[targetUserId] = true)
+        const res = addReply(this.recipe.id, targetUserId, this.currentUser.id, 'nutritionist', text)
+        if (res && res.success) {
+          this.$set ? this.$set(this.replyInputs, targetUserId, '') : (this.replyInputs[targetUserId] = '')
+          this.loadRatingData()
+          this.showMessage('Reply submitted successfully!', 'success')
+        } else {
+          this.showMessage(res?.error || 'Failed to submit reply.', 'error')
+        }
+      } catch (err) {
+        console.error('submitReply error:', err)
+        this.showMessage('Unexpected error while submitting reply.', 'error')
+      } finally {
+        const targetUserId = review?.userId
+        this.$set ? this.$set(this.replySubmitting, targetUserId, false) : (this.replySubmitting[targetUserId] = false)
+      }
     }
   }
 }
@@ -680,5 +818,11 @@ export default {
     min-width: 48px;
     margin-bottom: 0.25rem;
   }
+}
+.reply-item {
+  font-size: 0.95rem;
+}
+.reply-form textarea {
+  resize: vertical;
 }
 </style>

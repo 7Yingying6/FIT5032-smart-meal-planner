@@ -204,6 +204,18 @@
                   </button>
                 </div>
 
+                <!-- OAuth providers -->
+                <div class="d-grid mb-3">
+                  <button 
+                    type="button" 
+                    class="btn btn-outline-secondary btn-lg"
+                    @click="loginWithGoogle"
+                    aria-label="Sign in with Google"
+                  >
+                    <Icon icon="mdi:google" class="me-2" />Continue with Google
+                  </button>
+                </div>
+
                 <!-- Password reset and switch -->
                 <div class="text-center">
                   <div v-if="isLogin" class="mb-2">
@@ -298,9 +310,11 @@
 import userStorage from '@/utils/userStorage.js'
 import passwordHash from '@/utils/passwordHash.js'
 
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import app from '@/firebase.js';
-const auth = getAuth(app);
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import app, { db, hasValidConfig } from '@/firebase.js'
+import { doc, setDoc, getDoc } from 'firebase/firestore'
+const auth = hasValidConfig && app ? getAuth(app) : null;
+const provider = hasValidConfig && app ? new GoogleAuthProvider() : null;
 
 export default {
   name: 'Auth',
@@ -508,6 +522,10 @@ export default {
       this.isSubmitting = true;
   
       try {
+        if (!auth) {
+          this.showErrorMessage('Firebase is not configured in development. Please set environment variables or use Quick Login after configuring demo accounts.');
+          return;
+        }
         let firebaseResult;
         let userCredential;
   
@@ -517,17 +535,38 @@ export default {
         } else {
           userCredential = await createUserWithEmailAndPassword(auth, this.form.email, this.form.password);
           firebaseResult = { success: true, message: 'Registration successful' };
+          // Write Firestore user profile (initial registration)
+          const uid = userCredential?.user?.uid;
+          const [firstName, ...lastNameParts] = (this.form.fullName || '').trim().split(' ');
+          const profile = {
+            email: this.form.email,
+            firstName: firstName || 'User',
+            lastName: lastNameParts.join(' '),
+            role: this.form.userRole || 'user',
+            createdAt: new Date().toISOString()
+          }
+          await setDoc(doc(db, 'users', uid), profile, { merge: true })
         }
   
         if (firebaseResult.success) {
           const uid = userCredential?.user?.uid || auth.currentUser?.uid || Date.now().toString();
+          // After login, read Firestore user profile to ensure role is obtained
+          let roleFromDb = 'user'
+          try {
+            const snap = await getDoc(doc(db, 'users', uid))
+            if (snap.exists()) {
+              roleFromDb = snap.data()?.role || roleFromDb
+            }
+          } catch (e) {
+            console.warn('Failed to load user profile from Firestore, fallback to form role:', e)
+          }
           const [firstName, ...lastNameParts] = (this.form.fullName || '').trim().split(' ');
           const userData = {
             id: uid,
             email: this.form.email,
             firstName: firstName || 'User',
             lastName: lastNameParts.join(' '),
-            role: this.form.userRole || 'user'
+            role: roleFromDb
           };
   
           userStorage.saveCurrentUser(userData, this.form.rememberMe);
@@ -575,7 +614,69 @@ export default {
     checkPasswordStrength(password) {
       return passwordHash.checkPasswordStrength(password)
     },
-    
+
+    // Google OAuth login
+    async loginWithGoogle() {
+      try {
+        if (!auth || !provider) {
+          this.showErrorMessage('Firebase is not configured in development. Please set environment variables or use Quick Login after configuring demo accounts.');
+          return;
+        }
+
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        console.log('Google sign-in successful:', user);
+
+        // Save basic Google profile to localStorage as requested
+        localStorage.setItem('user', JSON.stringify({
+          name: user.displayName,
+          email: user.email,
+          photo: user.photoURL,
+          uid: user.uid,
+        }));
+
+        // Ensure Firestore profile exists and read role
+        const uid = user.uid;
+        let roleFromDb = 'user';
+        try {
+          const snap = await getDoc(doc(db, 'users', uid));
+          if (!snap.exists()) {
+            const [firstName, ...lastNameParts] = (user.displayName || 'User').split(' ');
+            await setDoc(doc(db, 'users', uid), {
+              email: user.email,
+              firstName: firstName || 'User',
+              lastName: lastNameParts.join(' '),
+              role: roleFromDb,
+              createdAt: new Date().toISOString()
+            }, { merge: true });
+          } else {
+            roleFromDb = snap.data()?.role || roleFromDb;
+          }
+        } catch (e) {
+          console.warn('Failed to sync Firestore profile for Google user:', e);
+        }
+
+        const [firstName, ...lastNameParts] = (user.displayName || 'User').split(' ');
+        const userData = {
+          id: uid,
+          email: user.email,
+          firstName: firstName || 'User',
+          lastName: lastNameParts.join(' '),
+          role: roleFromDb
+        };
+
+        // Use existing userStorage for app-wide session consistency
+        userStorage.saveCurrentUser(userData, true);
+        this.showSuccessMessage('Login successful', userData);
+
+        const redirect = this.$route?.query?.redirect || '/';
+        this.$router.push(redirect);
+      } catch (error) {
+        console.error('Google sign-in failed:', error);
+        this.showErrorMessage(error.message || 'Google sign-in failed');
+      }
+    },
+
     // Quick login for demo users
     async quickLogin(userType) {
       try {
@@ -610,12 +711,22 @@ export default {
   
         const credential = await signInWithEmailAndPassword(auth, creds.email, creds.password);
         const uid = credential?.user?.uid || auth.currentUser?.uid || Date.now().toString();
+        // Get role from Firestore; if missing, use demoUser.role (student is treated as 'user')
+        let roleFromDb = demoUser.role === 'student' ? 'user' : demoUser.role
+        try {
+          const snap = await getDoc(doc(db, 'users', uid))
+          if (snap.exists()) {
+            roleFromDb = snap.data()?.role || roleFromDb
+          }
+        } catch (e) {
+          console.warn('Failed to load demo user profile from Firestore:', e)
+        }
         const userData = {
           id: uid,
           email: creds.email,
           firstName: demoUser.firstName,
           lastName: demoUser.lastName,
-          role: demoUser.role
+          role: roleFromDb
         };
   
         userStorage.saveCurrentUser(userData, true);
@@ -669,7 +780,7 @@ export default {
 }
 
 .btn-primary:hover {
-  background: #0b5ed7; /* slightly toned-down hover */
+  background: #1ea34c; /* darker green hover */
 }
 
 .form-control {

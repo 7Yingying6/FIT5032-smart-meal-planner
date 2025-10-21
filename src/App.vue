@@ -9,23 +9,26 @@ onMounted(() => {
   // Force a check of user authentication status
   const currentUser = userStorage.getCurrentUser()
   if (currentUser) {
-    console.log('App: User session restored:', currentUser.firstName)
+    if (import.meta.env.DEV) console.debug('App: User session restored:', currentUser.firstName)
   } else {
-    console.log('App: No active user session')
+    if (import.meta.env.DEV) console.debug('App: No active user session')
   }
 })
 </script>
 
 <template>
   <div id="app">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <!-- Navigation Bar -->
     <NavBar />
 
     <!-- Main Content -->
-    <main class="container-fluid px-0">
-      <transition name="page" mode="out-in">
-        <router-view />
-      </transition>
+    <main id="main-content" class="container-fluid px-0">
+      <router-view v-slot="{ Component }">
+        <transition name="page" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
 
     <!-- Footer -->
@@ -36,6 +39,8 @@ onMounted(() => {
 <style>
 /* Design tokens used across the app */
 :root {
+  --primary-color: #2b6cb0; /* WCAG-compliant deep blue */
+  --text-color: #1a202c; /* high-contrast text */
   /* Background gradient */
   --color-bg-start: #f0fdf4; /* light green */
   --color-bg-end: #ecfdf5;   /* mint green */
@@ -77,8 +82,8 @@ onMounted(() => {
   /* Bootstrap theme overrides */
   --bs-success: #22c55e;
   --bs-success-rgb: 34, 197, 94;
-  --bs-primary: #0369a1;
-  --bs-primary-rgb: 3, 105, 161;
+  --bs-primary: #22c55e;
+  --bs-primary-rgb: 34, 197, 94;
   --bs-info: #06b6d4;
   --bs-info-rgb: 6, 182, 212;
   --bs-danger: #dc2626;
@@ -164,4 +169,19 @@ main.container-fluid {
 .recipes-module { color: #007bff !important; }
 .meal-plan-module { color: #28a745 !important; }
 .auth-module { color: #6f42c1 !important; }
+
+/* Skip to Content link styles */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #000;
+  color: #fff;
+  padding: 8px;
+  z-index: 100;
+}
+.skip-link:focus { top: 0; }
+
+/* Buttons contrast */
+button { background-color: var(--primary-color); color: #fff; }
 </style>

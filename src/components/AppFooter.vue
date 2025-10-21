@@ -2,12 +2,12 @@
   <footer class="app-footer text-center py-4 mt-5">
     <div class="container">
       <nav class="footer-links d-flex justify-content-center flex-wrap gap-3" aria-label="Footer links">
-        <a href="#" class="footer-link">Privacy Policy</a>
-        <a href="#" class="footer-link">Terms</a>
-        <a href="#" class="footer-link">Disclaimer</a>
+        <!-- <a href="#" class="footer-link">Privacy Policy</a> -->
+        <!-- <a href="#" class="footer-link">Terms</a> -->
+        <router-link to="/disclaimer" class="footer-link">Disclaimer</router-link>
         <a href="#" class="footer-link">Contact</a>
       </nav>
-      <div class="footer-copy mt-2 text-secondary">© 2025 Smart Meal Planner</div>
+      <div class="footer-copy mt-2 text-secondary">&copy; 2025 NutriPlanner</div>
     </div>
   </footer>
 </template>

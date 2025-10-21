@@ -4,8 +4,41 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + Vue</title>
+    <title>NutriPlanner - Smart Meal Planning</title>
+    <meta name="description" content="Personalized weekly meal plans with smart recipe recommendations and automated shopping lists." />
     <meta name="referrer" content="no-referrer" />
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#22c55e" />
+    <meta name="msapplication-TileColor" content="#22c55e" />
+    
+    <!-- Remove manifest in development to avoid PWA/SW interfering with Vite dev server -->
+    <!-- DEV: force unregister and clear caches to avoid stale service worker during local development -->
+    <script>
+      (function() {
+        const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        if (isLocal && 'serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+          if (window.caches && caches.keys) {
+            caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+          }
+        }
+      })();
+    </script>
+    
+    <!-- Apple Touch (optional in dev; keep only if files exist in /public) -->
+    <!-- <link rel="apple-touch-icon" href="/icon-192x192.png" /> -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="NutriPlanner" />
+    
+    <!-- Remove manual preloads; Vite handles module preloading automatically -->
+    
+    <!-- DNS Prefetch for external resources -->
+    <link rel="dns-prefetch" href="//images.unsplash.com" />
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    
+    <!-- Google Maps SDK will be loaded dynamically in MapView.vue using VITE_GOOGLE_MAPS_API_KEY from .env -->
   </head>
   <body>
     <div id="app"></div>

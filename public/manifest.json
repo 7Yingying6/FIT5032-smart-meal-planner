@@ -1,0 +1,117 @@
+{
+  "name": "NutriPlanner - Smart Meal Planning",
+  "short_name": "NutriPlanner",
+  "description": "Personalized weekly meal plans with smart recipe recommendations and automated shopping lists.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0fdf4",
+  "theme_color": "#22c55e",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["food", "lifestyle", "health"],
+  "icons": [
+    {
+      "src": "/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "375x667",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Recipes",
+      "short_name": "Recipes",
+      "description": "Browse and filter recipes",
+      "url": "/recipes",
+      "icons": [
+        {
+          "src": "/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Meal Plan",
+      "short_name": "Plan",
+      "description": "View your weekly meal plan",
+      "url": "/meal-plan",
+      "icons": [
+        {
+          "src": "/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Shopping List",
+      "short_name": "Shopping",
+      "description": "View your shopping list",
+      "url": "/shopping",
+      "icons": [
+        {
+          "src": "/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

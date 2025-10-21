@@ -1,50 +1,31 @@
 <template>
   <div class="home">
     <!-- Hero Section -->
-    <section class="hero-section text-white py-5">
-      <div class="hero-overlay"></div>
-      <div class="container-fluid position-relative px-0">
-        <div class="row align-items-center min-vh-75">
-          <div class="col-lg-6">
-            <div class="hero-content">
-              <h1 class="display-3 fw-bold mb-4 hero-title">
+    <section class="hero-section text-dark py-5">
+      <!-- hero overlay removed -->
+      <div class="container position-relative">
+        <div class="row align-items-center justify-content-center">
+          <div class="col-12 col-lg-8 mx-auto">
+            <div class="hero-content text-center">
+              <h1 class="display-3 fw-bold mb-4 hero-title text-center">
                 <Icon icon="mdi:leaf" class="me-3 text-success" />
-                Smart Meal Planner
+                NutriPlanner
               </h1>
               <div class="executive-summary">
                 <p class="lead mb-4 fs-5">
-                  Designed for busy professionals and health-conscious individuals who struggle with meal planning and grocery shopping. 
-                  Our platform provides personalized weekly meal plans with smart recipe recommendations and automated shopping lists. 
-                  Core features include recipe discovery, meal planning calendar, nutritional tracking, and ingredient substitution suggestions.
+                  Personalized weekly meal plans. Smart recipe recommendations. Automated shopping lists.
+                  Plan, cook, and track nutrition in one place--fast and simple.
                 </p>
               </div>
-              <div class="d-flex gap-3 flex-wrap">
-                <router-link to="/recipes" class="btn btn-success btn-lg px-4 py-3 rounded-pill">
+              <div class="d-flex gap-3 flex-wrap justify-content-center">
+                <router-link to="/recipes" class="btn btn-success btn-lg px-4 py-3">
                   <Icon icon="mdi:book-open-page-variant" class="me-2" />
                   Explore Recipes
                 </router-link>
-                <router-link to="/meal-plan" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill">
+                <router-link to="/meal-plan" class="btn btn-outline-secondary btn-lg px-4 py-3">
                   <Icon icon="mdi:calendar-week" class="me-2" />
                   Plan Meals
                 </router-link>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-6 text-center">
-            <div class="hero-image">
-              <div class="floating-elements">
-                <div class="floating-icon floating-icon-1">
-                  <Icon icon="mdi:apple" class="text-success" style="font-size: 3rem" />
-                </div>
-                <div class="floating-icon floating-icon-2">
-                  <Icon icon="mdi:carrot" class="text-warning" style="font-size: 2rem" />
-                </div>
-                <div class="floating-icon floating-icon-3">
-                  <Icon icon="mdi:fish" class="text-info" style="font-size: 2rem" />
-                </div>
-                <div class="main-icon">
-                  <Icon icon="mdi:silverware-fork-knife" class="text-white opacity-75" style="font-size: 6rem" />
-                </div>
               </div>
             </div>
           </div>
@@ -137,6 +118,11 @@
                     <Icon icon="mdi:account-group" class="me-1" />{{ getRatingCount(recipe.id) }} reviews
                   </small>
                 </div>
+                <div class="d-flex align-items-center mt-1" v-if="hasNutritionistReply(recipe.id)">
+                  <span class="badge bg-info">
+                    <Icon icon="mdi:account-badge" class="me-1" />Nutritionist replied
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -169,7 +155,7 @@
             <div class="cta-content p-5 rounded-4">
               <h3 class="display-6 fw-bold text-white mb-4">Ready to Start Your Healthy Journey?</h3>
               <p class="lead text-white mb-4 opacity-90">
-                Join thousands of users who have transformed their eating habits with our smart meal planning platform.
+                Try NutriPlanner and be part of our early adopters--help us improve a smart meal planning platform for everyone.
               </p>
               <router-link to="/auth" class="btn btn-light btn-lg px-5 py-3 rounded-pill fw-bold">
                 <Icon icon="mdi:account-plus" class="me-2" />
@@ -187,6 +173,7 @@
 import FeatureCard from '@/components/FeatureCard.vue'
 import recipesData from '@/data/recipes.json'
 import { getRecipeRatings } from '@/utils/ratingStorage'
+import { ImageOptimizer } from '@/utils/imageOptimizer'
 
 // Module-level local image map to avoid this-context issues
 const LOCAL_IMAGE_MAP = Object.freeze({
@@ -267,44 +254,32 @@ export default {
       const ratingData = getRecipeRatings(recipeId)
       return ratingData.totalRatings || 0
     },
+    hasNutritionistReply(recipeId) {
+      const data = getRecipeRatings(recipeId)
+      const ratings = Array.isArray(data.ratings) ? data.ratings : []
+      return ratings.some(r => Array.isArray(r.replies) && r.replies.some(rep => (rep.role || '').toLowerCase() === 'nutritionist'))
+    },
     goToRecipe(recipeId) {
       this.$router.push(`/recipe/${recipeId}`)
     },
     getImageSrc(url, title) {
       if (title && LOCAL_IMAGE_MAP[title]) return LOCAL_IMAGE_MAP[title]
-      if (!url) return this.getDefaultSvg()
+      if (!url) return ImageOptimizer.getDefaultImage()
       if (typeof url === 'string' && url.startsWith('/images/')) return url
       if (typeof url === 'string' && /\.(jpg|jpeg|png|webp)$/i.test(url) && !/^https?:\/\//i.test(url)) {
         return `/images/${url}`
       }
-      try {
-        const u = new URL(url)
-        if (u.hostname.includes('images.unsplash.com')) {
-          if (!u.searchParams.has('auto')) u.searchParams.set('auto', 'format')
-          if (!u.searchParams.has('fit')) u.searchParams.set('fit', 'crop')
-          if (!u.searchParams.has('w')) u.searchParams.set('w', '1000')
-          if (!u.searchParams.has('q')) u.searchParams.set('q', '60')
-          return u.toString()
-        }
-        return url
-      } catch (e) {
-        return url
-      }
+      
+      // Use image optimizer
+      return ImageOptimizer.optimizeImageUrl(url, {
+        width: 800,
+        height: 600,
+        quality: 80
+      })
     },
     onImgError(e) {
-      e.target.src = this.getDefaultSvg()
+      e.target.src = ImageOptimizer.getDefaultImage()
       e.target.classList.add('image-fallback')
-    },
-    getDefaultSvg() {
-      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1000' height='600' viewBox='0 0 1000 600'>
-        <rect width='1000' height='600' fill='#f0f0f0'/>
-        <g fill='#bbb'>
-          <circle cx='500' cy='260' r='90'/>
-          <rect x='400' y='360' width='200' height='24' rx='12'/>
-        </g>
-        <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='22' fill='#888'>Image unavailable</text>
-      </svg>`
-      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
     }
   }
 }
@@ -312,8 +287,8 @@ export default {
 
 <style scoped>
 .hero-section {
-  background: linear-gradient(180deg, #91dc95 0%, #1e5a2c 100%);
-  min-height: 100vh;
+  background: #ffffff;
+  min-height: 65vh;
   position: relative;
 }
 
@@ -336,12 +311,10 @@ export default {
 }
 
 .hero-title {
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  /* remove heavy text shadow for a cleaner look */
+  text-shadow: none;
 }
 
-.hero-content {
-  /* Simplified effects */
-}
 
 .executive-summary {
   background: rgba(255, 255, 255, 0.1);
@@ -392,14 +365,16 @@ export default {
   background: white;
   border-radius: 12px;
   overflow: hidden;
-  transition: all 0.3s ease;
+  /* remove animation/transition */
+  transition: none;
   cursor: pointer;
   border: 1px solid #e9ecef;
 }
 
 .recipe-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  /* disable hover elevation */
+  transform: none;
+  box-shadow: none !important;
 }
 
 .recipe-image-container {
@@ -412,11 +387,11 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: none;
 }
 
 .recipe-card:hover .recipe-image {
-  transform: scale(1.05);
+  transform: none;
 }
 
 .recipe-badge {
@@ -465,12 +440,10 @@ export default {
 }
 
 .btn-outline-light:hover {
-  background-color: rgba(255,255,255,0.15);
+  /* align with outline-secondary change */
+  background-color: transparent;
 }
 
-.hero-image {
-  /* Removed animation */
-}
 
 @media (max-width: 768px) {
   .hero-section {
@@ -530,6 +503,12 @@ export default {
   
   .hero-content {
     margin-bottom: 2rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .hero-title {
+    white-space: nowrap;
   }
 }
 </style>

@@ -1,4 +1,4 @@
-# Smart Meal Planner
+# NutriPlanner
 
 A small Vue 3 app I put together for planning weeknight meals, browsing recipes, and turning the plan into a clean shopping list. Built with Vite, designed to be fast and easy to use on both desktop and mobile.
 
